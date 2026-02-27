@@ -9,7 +9,7 @@ Route::get('/home', function () {
 });
 Route::get('/produk', [ProdukController::class, 'index'])->name('produk');
 Route::get('/dashboard', function () {
-    return view('dashboard.index');
+    return view('dashboard.homepage');
 })->name('dashboard');
 Route::get('/login', function () {
     return view('login');
