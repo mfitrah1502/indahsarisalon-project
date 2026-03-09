@@ -181,6 +181,36 @@ function add_scroller() {
     new SimpleBar(navbarContent);
   }
 }
+function initSidebarToggle() {
+  const sidebarToggle = document.querySelector('#sidebar-hide');
+  if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', function (e) {
+      e.preventDefault();
+      document.body.classList.toggle('pc-sidebar-collapsed');
+    });
+  }
+
+  const mobileToggle = document.querySelector('#mobile-collapse');
+  if (mobileToggle) {
+    mobileToggle.addEventListener('click', function (e) {
+      e.preventDefault();
+      document.body.classList.toggle('pc-sidebar-popup-active');
+    });
+  }
+}
+
+// Jalankan pertama kali
+document.addEventListener('DOMContentLoaded', initSidebarToggle);
+
+// Jika pake AJAX load halaman
+function ajaxLoadPage(url) {
+  fetch(url)
+    .then(res => res.text())
+    .then(html => {
+      document.querySelector('#main-content').innerHTML = html;
+      initSidebarToggle(); // bind lagi
+    });
+}
 
 // Menu click start
 function menu_click() {
@@ -189,7 +219,7 @@ function menu_click() {
 
   // Remove previous click events
   menuItems.forEach((item) => {
-    item.removeEventListener('click', function () {});
+    item.removeEventListener('click', function () { });
   });
 
   // Hide all submenus initially

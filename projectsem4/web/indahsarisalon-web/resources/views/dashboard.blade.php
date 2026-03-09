@@ -49,7 +49,7 @@
     <nav class="navbar navbar-expand-md navbar-light default">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <img src="assets/images/logo-dark.svg" alt="logo" class="img-fluid" />
+                <img src="assets/images/favicon.svg" alt="logo" class="img-fluid" />
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01"
                 aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,7 +101,7 @@
     <script src="assets/js/theme.js"></script>
     <script src="assets/js/plugins/feather.min.js"></script>
     <script>
-        layout_change('light');
+        layout_change('dark');
     </script>
     <script>
         font_change('Roboto');

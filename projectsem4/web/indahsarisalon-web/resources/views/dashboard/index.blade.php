@@ -68,7 +68,7 @@
             <i class="ti ti-apps"></i>
           </li>
           <li class="pc-item">
-            <a href="{{ route('produk') }}" class="pc-link">
+            <a href="{{ route('produk.index') }}" class="pc-link">
               <span class="pc-micon"><i class="ti ti-shopping-cart"></i></span>
               <span class="pc-mtext">Produk</span>
             </a>

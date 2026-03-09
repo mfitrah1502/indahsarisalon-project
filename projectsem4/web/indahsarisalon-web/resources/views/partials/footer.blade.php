@@ -3,19 +3,35 @@
         <div class="row">
             <div class="col-sm-6 my-1">
                 <p class="m-0">
-                    BarberShop 2026, All rights reserved | Developed by Group 1
+                    Indah Sari Salon 2026, All rights reserved | Developed by Group 1
                     <a href="https://themeforest.net/user/codedthemes" target="_blank"></a>
                 </p>
             </div>
-            <div class="col-sm-6 ms-auto my-1">
-                <ul class="list-inline footer-link mb-0 justify-content-sm-end d-flex">
-                    <li class="list-inline-item"><a href="../index.html">Home</a></li>
-                    <li class="list-inline-item"><a href="https://codedthemes.gitbook.io/berry-bootstrap/"
-                            target="_blank">Documentation</a></li>
-                    <li class="list-inline-item"><a href="https://codedthemes.support-hub.io/"
-                            target="_blank">Support</a></li>
-                </ul>
+            <div class="col-sm-6 ms-auto my-1 text-end">
+                <p class="m-0">
+                    <span id="currentDateTime"></span>
+                </p>
             </div>
         </div>
     </div>
 </footer>
+
+<script>
+    function updateDateTime() {
+        const now = new Date();
+
+        // Opsi format tanggal, misal: Senin, 9 Maret 2026
+        const optionsDate = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+        const formattedDate = now.toLocaleDateString('id-ID', optionsDate);
+
+        // Format waktu 12 jam dengan AM/PM, contoh: 02:05:09 PM
+        const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+        const formattedTime = now.toLocaleTimeString('en-US', optionsTime);
+
+        // Gabungkan tanggal dan waktu
+        document.getElementById('currentDateTime').textContent = `${formattedDate} - ${formattedTime}`;
+    }
+
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+</script>
