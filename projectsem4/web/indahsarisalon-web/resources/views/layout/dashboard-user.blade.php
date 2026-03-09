@@ -12,7 +12,7 @@
 
 <body>
     <!-- Sidebar -->
-    @include('partials.sidebar')
+    @include('partials.sidebar-pelanggan')
 
     <!-- Header -->
     @include('partials.header')

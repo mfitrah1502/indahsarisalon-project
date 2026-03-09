@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Register</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -19,6 +19,7 @@
         .left-panel {
             flex: 1;
             background: #ffffff;
+
             padding-left: 0px;
         }
 
@@ -30,6 +31,9 @@
             align-items: center;
             padding-right: 120px;
             padding-left: 120px;
+
+            /* pink lembut seperti gambar */
+
         }
 
         .auth-card {
@@ -75,19 +79,41 @@
 
         <div class="auth-card">
 
-            <h2 class="text-center mb-2">Login</h2>
-            <p class="text-center text-muted mb-4">Silahkan login terlebih dahulu.</p>
+            <h2 class="text-center mb-2">Register</h2>
+            <p class="text-center text-muted mb-4">Silahkan buat akun baru.</p>
 
-            {{-- Alert error --}}
-            @if(session('error'))
+            {{-- ERROR --}}
+            @if($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show">
-                    {{ session('error') }}
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
 
-            <form action="{{ route('login.process') }}" method="POST">
+            <form action="{{ route('register.process') }}" method="POST">
                 @csrf
+
+                <div class="mb-3">
+                    <label class="fw-bold">Full Name</label>
+                    <input type="text" name="name" value="{{ old('name') }}"
+                        class="form-control @error('name') is-invalid @enderror">
+                    @error('name')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label class="fw-bold">Email</label>
+                    <input type="email" name="email" value="{{ old('email') }}"
+                        class="form-control @error('email') is-invalid @enderror">
+                    @error('email')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
 
                 <div class="mb-3">
                     <label class="fw-bold">Username</label>
@@ -106,34 +132,24 @@
                     @enderror
                 </div>
 
+                <div class="mb-4">
+                    <label class="fw-bold">Confirm Password</label>
+                    <input type="password" name="password_confirmation" class="form-control">
+                </div>
+
                 <button type="submit" class="btn btn-primary w-100 py-2">
-                    Login
+                    Register
                 </button>
 
                 <p class="text-center mt-3">
-                    Belum memiliki akun? <a href="{{ route('register') }}">Daftar</a>
+                    Sudah memiliki akun?
+                    <a href="{{ route('login') }}">Login</a>
                 </p>
 
             </form>
         </div>
 
     </div>
-    <!-- Tambahkan tepat sebelum </body> -->
-    <script>
-        // Ambil semua input di form
-        const inputs = document.querySelectorAll('input[name="username"], input[name="password"]');
-
-        // Ambil elemen alert
-        const alertBox = document.querySelector('.alert-danger');
-
-        if (alertBox) {
-            inputs.forEach(input => {
-                input.addEventListener('focus', () => {
-                    alertBox.remove(); // Hapus alert saat input difokus
-                });
-            });
-        }
-    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

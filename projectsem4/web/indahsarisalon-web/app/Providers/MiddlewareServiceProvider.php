@@ -6,22 +6,11 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\RoleMiddleware;
 
-class AppServiceProvider extends ServiceProvider
+class MiddlewareServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void
-    {
-        //
-    }
-
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
+        // Daftarkan route middleware
         Route::aliasMiddleware('role', RoleMiddleware::class);
-        //
     }
 }

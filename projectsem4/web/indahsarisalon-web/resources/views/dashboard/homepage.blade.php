@@ -25,8 +25,14 @@
         <div class="pc-content" id="main-content">
             <!-- [ Main Content ] start -->
             <div class="row">
+                <div class="col-6">
+                    <button id="btn-absen-masuk" class="btn btn-success w-100">Absen Masuk</button>
+                </div>
+                <div class="col-6">
+                    <button id="btn-absen-keluar" class="btn btn-danger w-100">Absen Keluar</button>
+                </div>
                 <!-- [ sample-page ] start -->
-                <div class="col-xl-4 col-md-6">
+                <div class="col-xl-4 col-md-12">
                     <div class="card bg-secondary-dark dashnum-card text-white overflow-hidden">
                         <span class="round small"></span>
                         <span class="round big"></span>
@@ -242,6 +248,29 @@
 
             });
 
+        });
+        document.getElementById('btn-absen-masuk').addEventListener('click', function () {
+            fetch("{{ route('absensi.masuk') }}", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Accept": "application/json",
+                },
+            })
+                .then(res => res.json())
+                .then(res => alert(res.message));
+        });
+
+        document.getElementById('btn-absen-keluar').addEventListener('click', function () {
+            fetch("{{ route('absensi.keluar') }}", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Accept": "application/json",
+                },
+            })
+                .then(res => res.json())
+                .then(res => alert(res.message));
         });
     </script>
     <!-- [Page Specific JS] end -->
