@@ -23,9 +23,6 @@ Route::resource('produk', ProdukController::class);
 
 // ------------------------------
 // Dashboard
-// ------------------------------
-// Route::get('/dashboard', fn() => view('dashboard.homepage'))->name('dashboard');
-// Route::get('/dashboard-user', fn() => view('dashboard.homepage-user'))->name('dashboard.user');
 Route::resource('karyawan', KaryawanController::class);
 Route::get('/karyawan/{id}/absensi', [KaryawanController::class, 'absensi'])
     ->name('karyawan.absensi');
@@ -52,9 +49,6 @@ Route::get('/treatment/filter-debug', [TreatmentController::class, 'filter'])->n
 
     Route::get('/dashboard', fn() => view('dashboard.homepage'))
     ->name('dashboard');
-
-    // Route::get('/dashboard/kasir', fn() => view('dashboard.kasir'))
-    // ->name('dashboard.kasir');
 
     Route::get('/dashboard/user', fn() => view('dashboard.homepage-user'))
     ->name('dashboard.user');

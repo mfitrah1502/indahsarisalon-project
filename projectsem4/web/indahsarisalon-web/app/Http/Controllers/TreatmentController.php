@@ -13,11 +13,13 @@ class TreatmentController extends Controller
     // Menampilkan daftar treatment dengan filter, search, dan sort
     public function index(Request $request)
     {
-        $query = Treatment::with('details'); // eager load detail
+        $query = Treatment::with('details', 'category'); // eager load detail dan kategori
 
         // Filter kategori
         if($request->category) {
-            $query->where('category', $request->category);
+            $query->whereHas('category', function($q) use ($request) {
+            $q->where('name', $request->category);
+        });
         }
 
         // Search nama
@@ -48,7 +50,7 @@ class TreatmentController extends Controller
         $treatments = $query->paginate(10);
 
         // Jika kategori disimpan sebagai array di controller
-        $categories = Treatment::pluck('category')->unique();
+        $categories = Category::all(); // Ambil semua kategori untuk filter dropdown
         $treatments->transform(function($treatment) {
     $treatment->details_for_modal = $treatment->details->map(function($d){
         return [
@@ -67,7 +69,7 @@ class TreatmentController extends Controller
     // Menampilkan form tambah treatment
     public function create()
     {
-        $categories = Category::all();
+         $categories = Category::all(); // Ambil semua kategori untuk dropdown
         return view('treatment.create', compact('categories'));
     }
 
@@ -83,11 +85,19 @@ class TreatmentController extends Controller
         'promo_type' => 'nullable|string',
         'promo_value' => 'nullable|numeric',
     ]);
+    if ($request->category) {
+        // Simpan kategori baru jika diisi
+        $category = Category::firstOrCreate(['name' => $request->category]);
+        $category_id = $category->id;
+    } else {
+        // Ambil dari dropdown
+        $category_id = $request->category_id;
+    }
 
     // Simpan treatment
     $treatment = new Treatment();
     $treatment->name = $request->name;
-    $treatment->category = $request->category ?? 'Uncategorized';
+    $treatment->category_id = $category_id;
     $treatment->is_promo = $request->has('is_promo') ? 1 : 0;
     $treatment->promo_type = $request->promo_type;
     $treatment->promo_value = $request->promo_value;
@@ -97,7 +107,7 @@ class TreatmentController extends Controller
     foreach ($request->details as $detail) {
         $treatment->details()->create([
             'name' => $detail['name'],
-            'duration' => $detail['duration'],
+            'duration' => $detail['duration'] ?? 0,
             'price' => $detail['price'],
             'description' => $detail['description'] ?? null,
         ]);
@@ -110,7 +120,7 @@ class TreatmentController extends Controller
     // Menampilkan form edit
     public function edit(Treatment $treatment)
     {
-        $categories = Category::all();
+        $categories = Category::all(); // Ambil semua kategori untuk dropdown
         return view('treatment.edit', compact('treatment','categories'));
     }
 
@@ -119,7 +129,7 @@ class TreatmentController extends Controller
     {
         // Update treatment utama
         $treatment->name = $request->name;
-        $treatment->category = $request->category ?? 'Uncategorized';
+        $treatment->category_id = $request->category_id;
         $treatment->is_promo = $request->has('is_promo') ? 1 : 0;
         $treatment->promo_type = $request->promo_type;
         $treatment->promo_value = $request->promo_value;
@@ -153,10 +163,12 @@ class TreatmentController extends Controller
 
 public function filter(Request $request)
 {
-    $query = Treatment::with('details');
+    $query = Treatment::with(['details', 'category']); // <- tambahkan 'category'
 
     if ($request->category) {
-        $query->where('category', $request->category);
+        $query->whereHas('category', function($q) use ($request) {
+            $q->where('name', $request->category);
+        });
     }
 
     if ($request->search) {
@@ -182,7 +194,7 @@ public function filter(Request $request)
         $query->orderBy('created_at', 'desc');
     }
 
-    $treatments = $query->get(); // note: jangan paginate karena kita load via AJAX
+    $treatments = $query->get(); // AJAX load
 
     return view('treatment.table', compact('treatments'));}
 }

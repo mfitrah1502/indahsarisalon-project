@@ -11,7 +11,7 @@ class Treatment extends Model
 
     protected $fillable = [
         'name',
-        'category',
+        'category_id',
         'is_promo',
         'promo_type',
         'promo_value',
@@ -24,7 +24,7 @@ class Treatment extends Model
     }
     public function category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class, 'category_id', 'id');
     }
 
 }
