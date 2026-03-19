@@ -11,11 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('treatments', function (Blueprint $table) {
-    $table->id();
-    $table->string('name'); // Hair Ritual, Hair Colouring, Face Ritual, dll
-    $table->timestamps();
-});
+       
        Schema::create('hair_ritual_details', function (Blueprint $table) {
     $table->id();
     $table->foreignId('treatment_id')->constrained('treatments')->onDelete('cascade'); // treatment_id Hair Ritual

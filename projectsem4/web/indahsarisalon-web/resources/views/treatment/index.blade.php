@@ -63,8 +63,8 @@
                             <select id="filterCategory" class="form-control">
                                 <option value="">Semua Kategori</option>
                                 @foreach($categories as $category)
-                                    <option value="{{ $category }}" {{ request('category') == $category ? 'selected' : '' }}>
-                                        {{ $category }}
+                                    <option value="{{ $category->name }}" {{ request('category') == $category->name ? 'selected' : '' }}>
+                                        {{ $category->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -108,7 +108,7 @@
 
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $treatment->name }}</td>
-                                    <td>{{ $treatment->category }}</td>
+                                    <td>{{ $treatment->category ? $treatment->category->name : 'Kosong' }}</td>
 
                                     <td>
                                         Rp {{ number_format($treatment->details->min('price') ?? 0, 0, ',', '.') }}
