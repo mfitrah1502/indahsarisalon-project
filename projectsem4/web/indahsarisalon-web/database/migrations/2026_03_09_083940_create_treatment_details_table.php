@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('treatment_details', function (Blueprint $table) {
     $table->id();
-    $table->unsignedBigInteger('treatment_id')->nullable(); // kategori treatment
-    $table->string('name'); // nama sub-treatment
-    $table->integer('duration_minutes')->nullable();
+    $table->foreignId('treatment_id')->constrained()->cascadeOnDelete();
+    $table->string('name');
+    $table->integer('duration');
+    $table->decimal('price',10,2);
     $table->text('description')->nullable();
-    $table->decimal('price', 12, 2)->nullable(); // untuk treatment dengan harga tetap
     $table->timestamps();
 });
     }

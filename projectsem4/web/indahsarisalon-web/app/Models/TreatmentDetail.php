@@ -12,7 +12,7 @@ class TreatmentDetail extends Model
     protected $fillable = [
         'treatment_id',
         'name',
-        'duration_minutes',
+        'duration',
         'description',
         'price',
     ];
