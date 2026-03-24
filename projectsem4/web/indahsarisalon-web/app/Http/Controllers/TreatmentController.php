@@ -47,7 +47,7 @@ class TreatmentController extends Controller
             $query->orderBy('created_at', 'desc');
         }
 
-        $treatments = $query->paginate(10);
+        $treatments = $query->with('category', 'details')->paginate(10);
 
         // Jika kategori disimpan sebagai array di controller
         $categories = Category::all(); // Ambil semua kategori untuk filter dropdown
@@ -78,20 +78,24 @@ class TreatmentController extends Controller
     {
         $request->validate([
         'name' => 'required|string|max:255',
-        'category' => 'required|string',   // wajib ada input category di form
+        'category_id' => 'nullable|exists:categories,id',
+        'category' => 'nullable|string',   // wajib ada input category di form
         'details.*.name' => 'required|string',
         'details.*.duration' => 'required|integer',
         'details.*.price' => 'required|numeric',
         'promo_type' => 'nullable|string',
         'promo_value' => 'nullable|numeric',
     ]);
-    if ($request->category) {
-        // Simpan kategori baru jika diisi
+
+    if ($request->filled('category')) {
+        // Kalau ada input kategori baru, buat kategori baru
         $category = Category::firstOrCreate(['name' => $request->category]);
         $category_id = $category->id;
-    } else {
-        // Ambil dari dropdown
+    } elseif ($request->filled('category_id')) {
+        // Kalau pilih dari dropdown
         $category_id = $request->category_id;
+    } else {
+        $category_id = null; // Tidak pilih kategori sama sekali
     }
 
     // Simpan treatment
