@@ -105,7 +105,7 @@
                                     data-category="{{ $treatment->category ? $treatment->category->name : 'Empty'}}"
                                     data-promo="{{ $treatment->is_promo ? $treatment->promo_type . ' ' . $treatment->promo_value : 'Tidak ada' }}"
                                     data-details='@json($treatment->details)'
-                                    data-image="{{ $treatment->image }}">
+                                    data-image="{{ $treatment->image ?? ''}}">
 
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $treatment->name }}</td>
@@ -151,11 +151,13 @@
                         <div class="popup-box">
                             <span class="popup-close">&times;</span>
 
-                            <div class="text-center mb-3">
-        <img id="popupImage" src="" width="150"
-            style="border-radius:10px; object-fit:cover;">
-    </div>
                             <h4 id="popupName"></h4>
+                             @if(isset($treatment) && $treatment->image)
+            <img id="popupImage" 
+                 class="img-fluid mb-2" 
+                 style="max-width: 200px; height: auto;" 
+                 alt="{{ "Gambar" }}">
+        @endif
                             <p><b>Kategori:</b> <span id="popupCategory"></span></p>
                             <p><b>Promo:</b> <span id="popupPromo"></span></p>
 
@@ -246,7 +248,7 @@
             let image = row.data('image');
 
 if (image) {
-    $('#popupImage').attr('src', '/storage/treatments/' + image);
+    $('#popupImage').attr('src', 'https://YOUR-PROJECT.supabase.co/storage/v1/object/public/treatments/' + image);
 } else {
     $('#popupImage').attr('src', '/assets/images/no-image.jpg');
 }

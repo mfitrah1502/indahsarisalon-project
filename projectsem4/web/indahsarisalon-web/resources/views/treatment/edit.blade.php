@@ -18,7 +18,9 @@
             <div class="card">
                 <div class="card-header">
                     <h4>Edit Treatment</h4>
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
                 </div>
+
 
                 <div class="card-body">
                     <form action="{{ route('treatment.update', $treatment->id) }}" method="POST"
@@ -28,8 +30,9 @@
 
                         <div class="mb-3 text-center">
                             @if($treatment->image)
-                                <img src="{{ asset('storage/treatments/' . $treatment->image) }}" width="150"
-                                    style="border-radius:10px; object-fit:cover;">
+                                <img src="https://{{ env('SUPABASE_PROJECT_REF') }}.supabase.co/storage/v1/object/public/{{ env('SUPABASE_BUCKET') }}/{{ $treatment->image }}"
+                                    class="img-fluid mb-2" style="max-width: 200px; height: auto;
+                                                                            alt=" {{ $treatment->name }}">
                             @else
                                 <img src="{{ asset('assets/images/no-image.jpg') }}" width="150" style="border-radius:10px;">
                             @endif
@@ -95,6 +98,8 @@
                         <button type="button" id="add_detail" class="btn btn-secondary mb-3">Tambah Detail</button>
 
                         <button type="submit" class="btn btn-primary">Update Treatment</button>
+
+
                     </form>
                 </div>
             </div>
@@ -129,11 +134,11 @@
         let detail_index = {{ $treatment->details->count() }};
         $('#add_detail').click(function () {
             let html = `<div class="detail_item mb-3">
-                                                                                    <input type="text" name="details[${detail_index}][name]" class="form-control mb-1" placeholder="Nama Detail" required>
-                                                                                    <input type="number" name="details[${detail_index}][duration]" class="form-control mb-1" placeholder="Durasi (menit)" required>
-                                                                                    <input type="number" name="details[${detail_index}][price]" class="form-control mb-1" placeholder="Harga" required>
-                                                                                    <textarea name="details[${detail_index}][description]" class="form-control" placeholder="Deskripsi"></textarea>
-                                                                                </div>`;
+                                                                                                                <input type="text" name="details[${detail_index}][name]" class="form-control mb-1" placeholder="Nama Detail" required>
+                                                                                                                <input type="number" name="details[${detail_index}][duration]" class="form-control mb-1" placeholder="Durasi (menit)" required>
+                                                                                                                <input type="number" name="details[${detail_index}][price]" class="form-control mb-1" placeholder="Harga" required>
+                                                                                                                <textarea name="details[${detail_index}][description]" class="form-control" placeholder="Deskripsi"></textarea>
+                                                                                                            </div>`;
             $('#details_wrapper').append(html);
             detail_index++;
         });
