@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ProdukController; 
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\AuthController; 
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\KaryawanController;
@@ -19,7 +20,10 @@ Route::get('/home', fn() => view('home'));
 // ------------------------------
 // Produk
 // ------------------------------
-Route::resource('produk', ProdukController::class);
+// Route::resource('produk', ProdukController::class);
+
+// Halaman About & Contact
+Route::get('/about', [PageController::class, 'about'])->name('about');
 
 // ------------------------------
 // Dashboard

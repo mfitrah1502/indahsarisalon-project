@@ -47,7 +47,7 @@ class TreatmentController extends Controller
             $query->orderBy('created_at', 'desc');
         }
 
-        $treatments = $query->paginate(10);
+        $treatments = $query->with('category', 'details')->paginate(10);
 
         // Jika kategori disimpan sebagai array di controller
         $categories = Category::all(); // Ambil semua kategori untuk filter dropdown

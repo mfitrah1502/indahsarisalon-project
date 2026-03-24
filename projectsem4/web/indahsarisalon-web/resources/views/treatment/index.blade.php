@@ -102,13 +102,13 @@
                         <tbody>
                             @forelse($treatments as $index => $treatment)
                                 <tr class="treatment-row" data-name="{{ $treatment->name }}"
-                                    data-category="{{ $treatment->category ? $treatment->category->name : 'Kosong'}}"
+                                    data-category="{{ $treatment->category ? $treatment->category->name : 'Empty'}}"
                                     data-promo="{{ $treatment->is_promo ? $treatment->promo_type . ' ' . $treatment->promo_value : 'Tidak ada' }}"
                                     data-details='@json($treatment->details)'>
 
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $treatment->name }}</td>
-                                    <td>{{ $treatment->category ? $treatment->category->name : 'Kosong' }}</td>
+                                    <td>{{ $treatment->category ? $treatment->category->name : 'Empty' }}</td>
 
                                     <td>
                                         Rp {{ number_format($treatment->details->min('price') ?? 0, 0, ',', '.') }}

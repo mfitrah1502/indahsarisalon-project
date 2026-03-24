@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-sm-6 my-1">
                 <p class="m-0">
-                    Indah Sari Salon 2026, All rights reserved | Developed by Group 1
+                    Indah Sari Salon, All rights reserved
                     <a href="https://themeforest.net/user/codedthemes" target="_blank"></a>
                 </p>
             </div>
