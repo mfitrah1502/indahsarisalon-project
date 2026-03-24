@@ -19,7 +19,52 @@
 
         .left-panel {
             flex: 1;
+            min-height: 100vh;
             background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .info-card {
+            width: 80%;
+            max-width: 320px;
+            background: #fef6f6;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .accordion-button {
+            background-color: #fff;
+            color: #ea8290;
+            font-weight: 600;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .accordion-button:focus {
+            box-shadow: none;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: #ea8290;
+            color: #fff;
+        }
+
+        .accordion-body {
+            font-size: 0.95rem;
+            color: #555;
+        }
+
+        .accordion-body a {
+            color: #ea8290;
+            text-decoration: none;
+        }
+
+        .accordion-body a:hover {
+            text-decoration: underline;
         }
 
         .right-panel {
@@ -103,7 +148,51 @@
 
 <body>
 
-    <div class="left-panel"></div>
+    <div class="left-panel">
+        <div class="info-card p-2 shadow-sm rounded-8 text-center">
+            <h3 class="mb-4">Selamat datang di Indah Sari Salon</h3>
+
+            <div class="accordion" id="infoAccordion">
+
+                <!-- About Us -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingAbout">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseAbout" aria-expanded="false" aria-controls="collapseAbout">
+                            About Us
+                        </button>
+                    </h2>
+                    <div id="collapseAbout" class="accordion-collapse collapse" aria-labelledby="headingAbout"
+                        data-bs-parent="#infoAccordion">
+                        <div class="accordion-body">
+                            <p>Indah Sari Salon adalah salon kecantikan profesional dengan layanan facial, treatment
+                                rambut, dan perawatan tubuh terbaik di kota Anda.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingContact">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseContact" aria-expanded="false" aria-controls="collapseContact">
+                            Contact
+                        </button>
+                    </h2>
+                    <div id="collapseContact" class="accordion-collapse collapse" aria-labelledby="headingContact"
+                        data-bs-parent="#infoAccordion">
+                        <div class="accordion-body">
+                            <p>Email: <a href="mailto:info@indahsarisalon.com">info@indahsarisalon.com</a></p>
+                            <p>Phone/WhatsApp: <a href="https://wa.me/6281234567890" target="_blank">+62
+                                    812-3456-7890</a></p>
+                            <p>Alamat: Jl. Contoh No.123, Kota Contoh</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
     <div class="right-panel">
 

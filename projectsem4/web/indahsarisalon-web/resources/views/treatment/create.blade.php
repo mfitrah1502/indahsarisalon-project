@@ -21,8 +21,12 @@
                 </div>
 
                 <div class="card-body">
-                    <form action="{{ route('treatment.store') }}" method="POST">
+                    <form action="{{ route('treatment.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
+                        <div class="mb-3">
+                            <label>Gambar Treatment</label>
+                            <input type="file" name="image" class="form-control" accept="image/*">
+                        </div>
                         <div class="mb-3">
                             <label>Nama Treatment</label>
                             <input type="text" name="name" class="form-control" required>
@@ -110,11 +114,11 @@
         let detail_index = 1;
         $('#add_detail').click(function () {
             let html = `<div class="detail_item mb-3">
-                                                                <input type="text" name="details[${detail_index}][name]" class="form-control mb-1" placeholder="Nama Detail" required>
-                                                                <input type="number" name="details[${detail_index}][duration]" class="form-control mb-1" placeholder="Durasi (menit)" required>
-                                                                <input type="number" name="details[${detail_index}][price]" class="form-control mb-1" placeholder="Harga" required>
-                                                                <textarea name="details[${detail_index}][description]" class="form-control" placeholder="Deskripsi"></textarea>
-                                                            </div>`;
+                                                                            <input type="text" name="details[${detail_index}][name]" class="form-control mb-1" placeholder="Nama Detail" required>
+                                                                            <input type="number" name="details[${detail_index}][duration]" class="form-control mb-1" placeholder="Durasi (menit)" required>
+                                                                            <input type="number" name="details[${detail_index}][price]" class="form-control mb-1" placeholder="Harga" required>
+                                                                            <textarea name="details[${detail_index}][description]" class="form-control" placeholder="Deskripsi"></textarea>
+                                                                        </div>`;
             $('#details_wrapper').append(html);
             detail_index++;
         });
