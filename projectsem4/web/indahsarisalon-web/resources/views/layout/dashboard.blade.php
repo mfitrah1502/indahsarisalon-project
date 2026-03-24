@@ -3,9 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard | Indah Sarisalon</title>
+    <title>@yield('title', 'Dashboard') | Indah Sarisalon</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <base href="{{ url('/') }}/">
     <!-- Styles -->
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
 </head>

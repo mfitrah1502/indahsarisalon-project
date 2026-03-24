@@ -102,7 +102,7 @@
                         <tbody>
                             @forelse($treatments as $index => $treatment)
                                 <tr class="treatment-row" data-name="{{ $treatment->name }}"
-                                    data-category="{{ $treatment->category }}"
+                                    data-category="{{ $treatment->category ? $treatment->category->name : 'Kosong'}}"
                                     data-promo="{{ $treatment->is_promo ? $treatment->promo_type . ' ' . $treatment->promo_value : 'Tidak ada' }}"
                                     data-details='@json($treatment->details)'>
 
@@ -191,8 +191,8 @@
 
     <script src="{{ asset('assets/js/plugins/popper.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/simplebar.min.js') }}"></script>
-    <script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('assets/js/icon/custom-font.js') }}"></script>
+    <script src="{{ asset('assets/js/plugins/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('assets/js/fonts/custom-font.js') }}"></script>
     <script src="{{ asset('assets/js/script.js') }}"></script>
     <script src="{{ asset('assets/js/theme.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/feather.min.js') }}"></script>
