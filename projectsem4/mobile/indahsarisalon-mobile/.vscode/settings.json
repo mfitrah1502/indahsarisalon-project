@@ -1,0 +1,20 @@
+{
+    "sqltools.connections": [
+        {
+            "pgOptions": {
+                "ssl": {
+                    "rejectUnauthorized": false
+                }
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "aws-1-ap-northeast-1.pooler.supabase.com",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "database": "postgres",
+            "username": "postgres.acwubkiohkqaedhwrvpr",
+            "name": "Indah Sari Project",
+            "password": "indahsarisalondb"
+        }
+    ]
+}

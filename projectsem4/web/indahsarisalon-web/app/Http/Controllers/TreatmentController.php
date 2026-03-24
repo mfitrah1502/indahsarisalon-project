@@ -85,8 +85,10 @@ class TreatmentController extends Controller
         'details.*.price' => 'required|numeric',
         'promo_type' => 'nullable|string',
         'promo_value' => 'nullable|numeric',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
     ]);
 
+    
     if ($request->filled('category')) {
         // Kalau ada input kategori baru, buat kategori baru
         $category = Category::firstOrCreate(['name' => $request->category]);
@@ -105,6 +107,13 @@ class TreatmentController extends Controller
     $treatment->is_promo = $request->has('is_promo') ? 1 : 0;
     $treatment->promo_type = $request->promo_type;
     $treatment->promo_value = $request->promo_value;
+    if ($request->hasFile('image')) {
+    $file = $request->file('image');
+    $filename = time() . '.' . $file->getClientOriginalExtension();
+    $file->storeAs('public/treatments', $filename);
+
+    $treatment->image = $filename;
+}
     $treatment->save();
 
     // Simpan detail treatment
@@ -137,6 +146,19 @@ class TreatmentController extends Controller
         $treatment->is_promo = $request->has('is_promo') ? 1 : 0;
         $treatment->promo_type = $request->promo_type;
         $treatment->promo_value = $request->promo_value;
+        if ($request->hasFile('image')) {
+
+    // Hapus gambar lama (opsional tapi bagus)
+    if ($treatment->image && file_exists(storage_path('app/public/treatments/' . $treatment->image))) {
+        unlink(storage_path('app/public/treatments/' . $treatment->image));
+    }
+
+    $file = $request->file('image');
+    $filename = time() . '.' . $file->getClientOriginalExtension();
+    $file->storeAs('public/treatments', $filename);
+
+    $treatment->image = $filename;
+}
         $treatment->save();
 
         // Hapus detail lama

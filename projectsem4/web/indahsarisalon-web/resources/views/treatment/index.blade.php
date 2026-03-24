@@ -104,7 +104,8 @@
                                 <tr class="treatment-row" data-name="{{ $treatment->name }}"
                                     data-category="{{ $treatment->category ? $treatment->category->name : 'Empty'}}"
                                     data-promo="{{ $treatment->is_promo ? $treatment->promo_type . ' ' . $treatment->promo_value : 'Tidak ada' }}"
-                                    data-details='@json($treatment->details)'>
+                                    data-details='@json($treatment->details)'
+                                    data-image="{{ $treatment->image }}">
 
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $treatment->name }}</td>
@@ -150,6 +151,10 @@
                         <div class="popup-box">
                             <span class="popup-close">&times;</span>
 
+                            <div class="text-center mb-3">
+        <img id="popupImage" src="" width="150"
+            style="border-radius:10px; object-fit:cover;">
+    </div>
                             <h4 id="popupName"></h4>
                             <p><b>Kategori:</b> <span id="popupCategory"></span></p>
                             <p><b>Promo:</b> <span id="popupPromo"></span></p>
@@ -233,10 +238,18 @@
             let row = $(this).closest('tr');
 
             let details = row.data('details');
+            
 
             $('#popupName').text(row.data('name'));
             $('#popupCategory').text(row.data('category'));
             $('#popupPromo').text(row.data('promo'));
+            let image = row.data('image');
+
+if (image) {
+    $('#popupImage').attr('src', '/storage/treatments/' + image);
+} else {
+    $('#popupImage').attr('src', '/assets/images/no-image.jpg');
+}
 
             let html = '';
 
