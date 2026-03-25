@@ -152,12 +152,12 @@
                             <span class="popup-close">&times;</span>
 
                             <h4 id="popupName"></h4>
-                             @if(isset($treatment) && $treatment->image)
-            <img id="popupImage" 
-                 class="img-fluid mb-2" 
-                 style="max-width: 200px; height: auto;" 
-                 alt="{{ "Gambar" }}">
-        @endif
+                             <div class="mb-3 text-center">
+    <img id="popupImage"
+         src=""
+         class="img-fluid mb-2"
+         style="max-width: 200px; height:auto;">
+</div>
                             <p><b>Kategori:</b> <span id="popupCategory"></span></p>
                             <p><b>Promo:</b> <span id="popupPromo"></span></p>
 
@@ -247,10 +247,12 @@
             $('#popupPromo').text(row.data('promo'));
             let image = row.data('image');
 
+let baseUrl = "https://{{ env('SUPABASE_PROJECT_REF') }}.supabase.co/storage/v1/object/public/{{ env('SUPABASE_BUCKET') }}/";
+
 if (image) {
-    $('#popupImage').attr('src', 'https://YOUR-PROJECT.supabase.co/storage/v1/object/public/treatments/' + image);
+    $('#popupImage').attr('src', baseUrl + image);
 } else {
-    $('#popupImage').attr('src', '/assets/images/no-image.jpg');
+    $('#popupImage').attr('src', "{{ asset('assets/images/no-image.jpg') }}");
 }
 
             let html = '';

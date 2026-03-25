@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\ProdukController; 
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\AuthController; 
@@ -19,6 +20,16 @@ Route::get('/home', fn() => view('home'));
 
 // ------------------------------
 // Produk
+// Daftar pelanggan
+Route::prefix('pelanggan')->name('pelanggan.')->group(function() {
+    Route::get('/', [PelangganController::class, 'index'])->name('index');        // tampilkan list
+    Route::get('/create', [PelangganController::class, 'create'])->name('create'); // form tambah
+    Route::post('/', [PelangganController::class, 'store'])->name('store');        // simpan baru
+    Route::get('/{pelanggan}/edit', [PelangganController::class, 'edit'])->name('edit'); // form edit
+    Route::put('/{pelanggan}', [PelangganController::class, 'update'])->name('update'); // update data
+    Route::delete('/{pelanggan}', [PelangganController::class, 'destroy'])->name('destroy'); // hapus
+    Route::get('/{pelanggan}', [PelangganController::class, 'show'])->name('show'); // detail pelanggan (optional)
+});
 // ------------------------------
 // Route::resource('produk', ProdukController::class);
 
@@ -48,6 +59,11 @@ Route::get('treatment/filter', [TreatmentController::class, 'filter'])->name('tr
 // resource route setelah
 Route::resource('treatment', TreatmentController::class);
 });
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::resource('pelanggan', PelangganController::class);
+});
+
 Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
 Route::get('/treatment/filter-debug', [TreatmentController::class, 'filter'])->name('treatment.filter.debug');
 

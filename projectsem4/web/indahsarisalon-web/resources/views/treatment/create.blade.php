@@ -25,11 +25,23 @@
                         @csrf
                         <div class="mb-3">
                             <label>Gambar Treatment</label>
-                            <input type="file" name="image" class="form-control" accept="image/*">
+                            <div id="drop-area"
+                                style="border:2px dashed #ccc; padding:20px; text-align:center; cursor:pointer;">
+                                <p>Drag & drop gambar di sini atau klik untuk pilih</p>
+                                <input type="file" name="image" id="imageInput" accept="image/*" hidden>
+                            </div>
+
+                            <img id="imagePreview" class="img-fluid mt-2" style="max-width:200px; display:none;">
+
+                            <button type="button" id="removeImage" class="btn btn-danger mt-2" style="display:none;">
+                                Hapus Gambar
+                            </button>
+                            {{-- <input type="file" name="image" class="form-control" accept="image/*">
                             <img id="imagePreview"
                                 src="{{ isset($treatment) && $treatment->image ? 'https://' . env('SUPABASE_PROJECT_REF') . '.supabase.co/storage/v1/object/public/' . env('SUPABASE_BUCKET') . '/' . $treatment->image : '' }}"
                                 class="img-fluid mt-2"
                                 style="max-width:200px; display: {{ isset($treatment) && $treatment->image ? 'block' : 'none' }};">
+                            --}}
 
                         </div>
                         <div class="mb-3">
@@ -119,13 +131,80 @@
         let detail_index = 1;
         $('#add_detail').click(function () {
             let html = `<div class="detail_item mb-3">
-                                                                                        <input type="text" name="details[${detail_index}][name]" class="form-control mb-1" placeholder="Nama Detail" required>
-                                                                                        <input type="number" name="details[${detail_index}][duration]" class="form-control mb-1" placeholder="Durasi (menit)" required>
-                                                                                        <input type="number" name="details[${detail_index}][price]" class="form-control mb-1" placeholder="Harga" required>
-                                                                                        <textarea name="details[${detail_index}][description]" class="form-control" placeholder="Deskripsi"></textarea>
-                                                                                    </div>`;
+                                                                                                        <input type="text" name="details[${detail_index}][name]" class="form-control mb-1" placeholder="Nama Detail" required>
+                                                                                                        <input type="number" name="details[${detail_index}][duration]" class="form-control mb-1" placeholder="Durasi (menit)" required>
+                                                                                                        <input type="number" name="details[${detail_index}][price]" class="form-control mb-1" placeholder="Harga" required>
+                                                                                                        <textarea name="details[${detail_index}][description]" class="form-control" placeholder="Deskripsi"></textarea>
+                                                                                                    </div>`;
             $('#details_wrapper').append(html);
             detail_index++;
+        });
+
+        const dropArea = document.getElementById('drop-area');
+        const inputFile = document.getElementById('imageInput');
+        const preview = document.getElementById('imagePreview');
+        const removeBtn = document.getElementById('removeImage');
+
+        // Klik area → buka file
+        dropArea.addEventListener('click', () => inputFile.click());
+
+        // Drag over
+        dropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropArea.style.background = '#f1f1f1';
+        });
+
+        dropArea.addEventListener('dragleave', () => {
+            dropArea.style.background = '#fff';
+        });
+
+        // Drop file
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropArea.style.background = '#fff';
+
+            const file = e.dataTransfer.files[0];
+            handleFile(file);
+        });
+
+        // Input change
+        inputFile.addEventListener('change', function () {
+            const file = this.files[0];
+            handleFile(file);
+        });
+
+        function handleFile(file) {
+            if (!file) return;
+
+            // ✅ Validasi tipe
+            const allowedTypes = ['image/jpeg', 'image/png'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Hanya JPG atau PNG!');
+                return;
+            }
+
+            // ✅ Validasi ukuran (2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Ukuran maksimal 2MB!');
+                return;
+            }
+
+            // ✅ Preview
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                removeBtn.style.display = 'inline-block';
+            }
+            reader.readAsDataURL(file);
+        }
+
+        // ✅ Hapus gambar
+        removeBtn.addEventListener('click', function () {
+            inputFile.value = '';
+            preview.src = '';
+            preview.style.display = 'none';
+            removeBtn.style.display = 'none';
         });
     </script>
 @endsection
