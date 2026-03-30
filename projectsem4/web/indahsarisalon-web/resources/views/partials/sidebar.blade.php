@@ -18,21 +18,9 @@
                 </li>
 
                 <li class="pc-item pc-caption">
-                    <label>Produk</label>
+                    <label>Manajemen</label>
                     <i class="ti ti-apps"></i>
                 </li>
-                <li class="pc-item">
-                    <a href="{{ route('produk.index') }}" class="pc-link">
-                        <span class="pc-micon"><i class="ti ti-shopping-cart"></i></span>
-                        <span class="pc-mtext">Produk</span>
-                    </a>
-                </li>
-                {{-- <li class="pc-item">
-                    <a class="pc-link">
-                        <span class="pc-micon"><i class="ti ti-color-swatch"></i></span>
-                        <span class="pc-mtext">Manajemen</span>
-                    </a>
-                </li> --}}
                 <li class="pc-item pc-hasmenu">
                     <a class="pc-link"><span class="pc-micon"><i class="ti ti-menu"></i></span><span
                             class="pc-mtext">Manajemen</span><span class="pc-arrow"><i
@@ -41,16 +29,30 @@
                         <li class="pc-item"><a href="{{ route('karyawan.index') }}" class="pc-link">Manajemen
                                 Karyawan</a>
                         </li>
-                        <li class="pc-item"><a class="pc-link" href="#!">Manajemen Pelanggan</a></li>
+                        <li class="pc-item"><a href="{{ route('pelanggan.index') }}" class="pc-link">Manajemen
+                                Pelanggan</a></li>
                         <li class="pc-item"><a href="{{ route('treatment.index') }}" class="pc-link">Manajemen
                                 Treatment</a></li>
                     </ul>
                 </li>
-                <li class="pc-item">
-                    <a class="pc-link">
-                        <span class="pc-micon"><i class="ti ti-plant-2"></i></span>
-                        <span class="pc-mtext">Booking</span>
-                    </a>
+                <li class="pc-item pc-hasmenu">
+                    <a class="pc-link"><span class="pc-micon"><i class="ti ti-wallet"></i></span><span
+                            class="pc-mtext">Keuangan</span><span class="pc-arrow"><i
+                                data-feather="chevron-right"></i></span></a>
+                    <ul class="pc-submenu">
+                        <li class="pc-item"><a class="pc-link" href="#!">Pemasukan</a></li>
+                        <li class="pc-item"><a class="pc-link" href="#!">Pengeluaran</a></li>
+                    </ul>
+                </li>
+                <li class="pc-item pc-hasmenu">
+                    <a class="pc-link"><span class="pc-micon"><i class="ti ti-calendar"></i></span><span
+                            class="pc-mtext">Booking</span><span class="pc-arrow"><i
+                                data-feather="chevron-right"></i></span></a>
+                    <ul class="pc-submenu">
+                        <li class="pc-item"><a class="pc-link" href="#!">Pemesanan</a></li>
+                        <li class="pc-item"><a class="pc-link" href="#!">Status Pemesanan</a></li>
+                        <li class="pc-item"><a class="pc-link" href="#!">Riwayat Pemesanan</a></li>
+                    </ul>
                 </li>
 
                 {{-- <li class="pc-item">
@@ -64,20 +66,20 @@
                     <label>Other</label>
                     <i class="ti ti-brand-chrome"></i>
                 </li>
-                <li class="pc-item"><a class="pc-link" target="_blank" href="{{ route('dashboard') }}">
-                        <span class="pc-micon"><i class="ti ti-file"></i></span>
+                <li class="pc-item"><a class="pc-link" href="{{ route('about') }}">
+                        <span class="pc-micon"><i class="ti ti-info-circle"></i></span>
                         <span class="pc-mtext">About Us</span>
                     </a>
                 </li>
-                <li class="pc-item"><a class="pc-link" target="_blank" href="{{ route('dashboard') }}">
-                        <span class="pc-micon"><i class="ti ti-file"></i></span>
-                        <span class="pc-mtext">Contact</span>
+                <li class="pc-item"><a class="pc-link" href="#!">
+                        <span class="pc-micon"><i class="ti ti-star"></i></span>
+                        <span class="pc-mtext">Rating</span>
                     </a>
                 </li>
 
                 <li class="pc-item pc-caption">
                     <label>Logout</label>
-                    <i class="ti ti-news"></i>
+                    <i class="ti ti-logout"></i>
                 </li>
                 <li class="pc-item">
                     <a class="pc-link" href="{{ route('auth') }}">

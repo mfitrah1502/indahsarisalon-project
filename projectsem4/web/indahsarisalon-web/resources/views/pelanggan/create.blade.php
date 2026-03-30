@@ -1,9 +1,7 @@
 @extends('layout.dashboard')
 
-@section('title', 'Tambah Karyawan')
-<!-- [Favicon] icon -->
+@section('title', 'Tambah Pelanggan')
 <link rel="icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/x-icon" />
-<!-- [Google Font] Family -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
     id="main-font-link" />
 <link rel="stylesheet" href="{{ asset('assets/fonts/phosphor/duotone/style.css') }}" />
@@ -19,20 +17,16 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h4>Tambah Karyawan</h4>
+                    <h4>Tambah Pelanggan</h4>
                 </div>
                 <div class="card-body">
                     @if ($errors->any())
                         <div class="alert alert-danger">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
+                            <ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
                         </div>
                     @endif
 
-                    <form action="{{ route('karyawan.store') }}" method="POST">
+                    <form action="{{ route('pelanggan.store') }}" method="POST">
                         @csrf
                         <div class="mb-3">
                             <label>Nama</label>
@@ -50,13 +44,8 @@
                             <label>Password</label>
                             <input type="password" name="password" class="form-control" required>
                         </div>
-                        <div class="mb-3">
-                            <label>Role</label>
-                            <select name="role" class="form-select" required>
-                                <option value="admin">Admin</option>
-                                <option value="kasir">Kasir</option>
-                            </select>
-                        </div>
+                        <!-- Role otomatis pelanggan -->
+                        <input type="hidden" name="role" value="pelanggan">
                         <div class="mb-3">
                             <label>Status</label>
                             <select name="status" class="form-select">
@@ -65,14 +54,14 @@
                             </select>
                         </div>
                         <button type="submit" class="btn btn-primary">Simpan</button>
-                        <a href="{{ route('karyawan.index') }}" class="btn btn-secondary">Batal</a>
+                        <a href="{{ route('pelanggan.index') }}" class="btn btn-secondary">Batal</a>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Scripts sama persis seperti produk -->
+    <!-- Scripts sama persis -->
     <script src="{{ asset('assets/js/plugins/popper.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/simplebar.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/bootstrap.min.js') }}"></script>

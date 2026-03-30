@@ -88,6 +88,51 @@
                         </div>
                     </div>
 
+                    
+                    <!-- Tambahkan tombol di atas table -->
+<div class="mb-3">
+    <button id="btnViewCategories" class="btn btn-secondary">Lihat Kategori</button>
+</div>
+
+<!-- Popup Daftar Kategori -->
+<div id="categoryPopup" class="popup-overlay" style="display:none;">
+    <div class="popup-box">
+        <span class="popup-close">&times;</span>
+        <h4>Daftar Kategori</h4>
+
+        <!-- Form Tambah Kategori -->
+        <form id="formAddCategory" class="mb-3">
+            @csrf
+            <div class="input-group">
+                <input type="text" id="newCategoryName" class="form-control" placeholder="Tambah kategori baru">
+                <button type="submit" class="btn btn-primary">Tambah</button>
+            </div>
+        </form>
+
+        <!-- Table Kategori -->
+        <table class="table table-bordered" id="categoryTable">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama Kategori</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($categories as $index => $category)
+                <tr data-id="{{ $category->id }}">
+                    <td>{{ $index + 1 }}</td>
+                    <td contenteditable="true" class="editable-category">{{ $category->name }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger btn-delete-category">Hapus</button>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+
                     <table class="table table-striped">
                         <thead>
                             <tr>
@@ -102,13 +147,14 @@
                         <tbody>
                             @forelse($treatments as $index => $treatment)
                                 <tr class="treatment-row" data-name="{{ $treatment->name }}"
-                                    data-category="{{ $treatment->category }}"
+                                    data-category="{{ $treatment->category ? $treatment->category->name : 'Empty'}}"
                                     data-promo="{{ $treatment->is_promo ? $treatment->promo_type . ' ' . $treatment->promo_value : 'Tidak ada' }}"
-                                    data-details='@json($treatment->details)'>
+                                    data-details='@json($treatment->details)'
+                                    data-image="{{ $treatment->image ?? ''}}">
 
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $treatment->name }}</td>
-                                    <td>{{ $treatment->category ? $treatment->category->name : 'Kosong' }}</td>
+                                    <td>{{ $treatment->category ? $treatment->category->name : 'Empty' }}</td>
 
                                     <td>
                                         Rp {{ number_format($treatment->details->min('price') ?? 0, 0, ',', '.') }}
@@ -151,6 +197,12 @@
                             <span class="popup-close">&times;</span>
 
                             <h4 id="popupName"></h4>
+                             <div class="mb-3 text-center">
+    <img id="popupImage"
+         src=""
+         class="img-fluid mb-2"
+         style="max-width: 200px; height:auto;">
+</div>
                             <p><b>Kategori:</b> <span id="popupCategory"></span></p>
                             <p><b>Promo:</b> <span id="popupPromo"></span></p>
 
@@ -191,8 +243,8 @@
 
     <script src="{{ asset('assets/js/plugins/popper.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/simplebar.min.js') }}"></script>
-    <script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('assets/js/icon/custom-font.js') }}"></script>
+    <script src="{{ asset('assets/js/plugins/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('assets/js/fonts/custom-font.js') }}"></script>
     <script src="{{ asset('assets/js/script.js') }}"></script>
     <script src="{{ asset('assets/js/theme.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/feather.min.js') }}"></script>
@@ -233,10 +285,20 @@
             let row = $(this).closest('tr');
 
             let details = row.data('details');
+            
 
             $('#popupName').text(row.data('name'));
             $('#popupCategory').text(row.data('category'));
             $('#popupPromo').text(row.data('promo'));
+            let image = row.data('image');
+
+let baseUrl = "https://{{ env('SUPABASE_PROJECT_REF') }}.supabase.co/storage/v1/object/public/{{ env('SUPABASE_BUCKET') }}/";
+
+if (image) {
+    $('#popupImage').attr('src', baseUrl + image);
+} else {
+    $('#popupImage').attr('src', "{{ asset('assets/images/no-image.jpg') }}");
+}
 
             let html = '';
 
@@ -263,5 +325,102 @@
                 $(this).fadeOut();
             }
         });
+
+        // Tampilkan popup kategori
+    $('#btnViewCategories').click(function () {
+        $('#categoryPopup').fadeIn();
+    });
+
+    $('.popup-close').click(function () {
+        $(this).closest('.popup-overlay').fadeOut();
+    });
+
+    $('#categoryPopup').click(function (e) {
+        if (e.target.id === 'categoryPopup') {
+            $(this).fadeOut();
+        }
+    });
+
+    // Tambah kategori baru
+    $('#formAddCategory').submit(function (e) {
+        e.preventDefault();
+        let name = $('#newCategoryName').val().trim();
+        if(!name) return alert('Nama kategori tidak boleh kosong.');
+
+        $.ajax({
+            url: "{{ route('categories.store') }}",
+            type: "POST",
+            data: { name: name, _token: '{{ csrf_token() }}' },
+            success: function(res){
+                // Tambah ke table
+                let category = res.data ?? res;
+
+    let count = $('#categoryTable tbody tr').length + 1;
+
+    $('#categoryTable tbody').append(`
+        <tr data-id="${category.id}">
+            <td>${count}</td>
+            <td contenteditable="true" class="editable-category">${category.name}</td>
+            <td><button class="btn btn-sm btn-danger btn-delete-category">Hapus</button></td>
+        </tr>
+    `);
+
+    $('#newCategoryName').val('');
+            },
+            error: function(err){
+                alert('Gagal menambah kategori.');
+            }
+        });
+    });
+
+    // Edit kategori inline
+    $(document).on('blur', '.editable-category', function () {
+    let row = $(this).closest('tr');
+    let id = row.data('id');
+    let name = $(this).text().trim();
+
+    if(!name) return alert('Nama kategori tidak boleh kosong.');
+
+    $.ajax({
+        url: '/categories/' + id,
+        type: 'POST', // 🔥 ubah
+        data: {
+            name: name,
+            _token: '{{ csrf_token() }}',
+            _method: 'PUT' // 🔥 ini kunci
+        },
+        success: function(res){
+            console.log('Kategori diperbarui');
+        },
+        error: function(err){
+            console.log(err.responseText);
+            alert('Gagal memperbarui kategori');
+        }
+    });
+});
+
+    // Hapus kategori
+    $(document).on('click', '.btn-delete-category', function () {
+    if(!confirm('Yakin ingin menghapus kategori ini?')) return;
+
+    let row = $(this).closest('tr');
+    let id = row.data('id');
+
+    $.ajax({
+        url: '/categories/' + id,
+        type: 'POST', // 🔥 ubah
+        data: {
+            _token: '{{ csrf_token() }}',
+            _method: 'DELETE'
+        },
+        success: function(res){
+            row.remove();
+        },
+        error: function(err){
+            console.log(err.responseText);
+            alert('Gagal menghapus kategori');
+        }
+    });
+});
     </script>
 @endsection
