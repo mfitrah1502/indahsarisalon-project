@@ -52,9 +52,19 @@
                         </div>
                         <div class="mb-3">
                             <label>Role</label>
-                            <select name="role" class="form-select" required>
+                            <select name="role" class="form-select" required id="roleSelect">
                                 <option value="admin">Admin</option>
-                                <option value="kasir">Kasir</option>
+                                <option value="karyawan">Karyawan</option>
+                            </select>
+                        </div>
+
+                        <!-- Field kategori (hanya muncul jika role = karyawan) -->
+                        <div class="mb-3" id="kategoriDiv" style="display:none;">
+                            <label>Kategori</label>
+                            <select name="kategori" class="form-select" required>
+                                <option value="">-- Pilih Kategori --</option>
+                                <option value="stylist" {{ old('kategori', $karyawan->kategori ?? '') == 'stylist' ? 'selected' : '' }}>Stylist</option>
+                                <option value="biasa" {{ old('kategori', $karyawan->kategori ?? '') == 'biasa' ? 'selected' : '' }}>Biasa</option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -87,5 +97,23 @@
         layout_caption_change('true');
         layout_rtl_change('false');
         preset_change('preset-1');
+
+        function toggleKategoriField() {
+            let role = document.getElementById('roleSelect').value;
+            let kategoriDiv = document.getElementById('kategoriDiv');
+            let kategoriSelect = document.getElementById('kategoriSelect');
+
+            if (role === 'karyawan') {
+                kategoriDiv.style.display = 'block';
+                kategoriSelect.setAttribute('required', 'required');
+            } else {
+                kategoriDiv.style.display = 'none';
+                kategoriSelect.removeAttribute('required');
+                kategoriSelect.value = ''; // kosongkan value
+            }
+        }
+
+        document.getElementById('roleSelect').addEventListener('change', toggleKategoriField);
+        toggleKategoriField(); // jalankan saat halaman load
     </script>
 @endsection
