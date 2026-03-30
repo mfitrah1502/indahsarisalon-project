@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\ProdukController; 
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\AuthController; 
 use App\Http\Controllers\PasswordResetController;
@@ -91,7 +92,7 @@ Route::middleware(['auth', 'session.timeout'])->group(function () {
     // ------------------------------
     // Absensi Kasir
     // ------------------------------
-    Route::prefix('absensi')->middleware('role:kasir')->group(function () {
+    Route::prefix('absensi')->middleware('role:karyawan')->group(function () {
         Route::post('/masuk', [AbsensiController::class, 'masuk'])->name('absensi.masuk');
         Route::post('/keluar', [AbsensiController::class, 'keluar'])->name('absensi.keluar');
         Route::post('/absen/masuk', [AbsensiController::class, 'absenMasuk'])->name('absensi.masuk');
@@ -110,4 +111,25 @@ Route::middleware(['auth', 'session.timeout'])->group(function () {
         // Pelanggan
         Route::resource('pelanggan', PelangganController::class);
     });
+    
+    //Booking
+    // Route::get('/booking', [BookingController::class, 'index'])->name('booking.index');
+    // Booking routes
+// Route::prefix('booking')->name('booking.')->group(function () {
+//     Route::get('/', [App\Http\Controllers\BookingController::class, 'index'])->name('index');
+    
+//     // Route untuk pilih treatment -> stylist & jadwal
+//     Route::get('/select/{treatment}', [App\Http\Controllers\BookingController::class, 'select'])
+//         ->name('select');
+// });
+// // Route baru untuk summary
+//     Route::post('/summary', [BookingController::class, 'summary'])->name('booking.summary');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/booking', [BookingController::class, 'index'])->name('booking.index'); // halaman daftar treatment
+    Route::get('/booking/select/{treatmentId?}', [BookingController::class, 'select'])->name('booking.select'); // step 1
+    Route::post('/booking/store', [BookingController::class, 'store'])->name('booking.store'); // simpan booking
+    Route::get('/booking/summary/{bookingId}', [BookingController::class, 'summary'])->name('booking.summary'); // step summary
+    Route::post('/booking/pay/{bookingId}', [BookingController::class, 'pay'])->name('booking.pay'); // bayar
+    Route::get('/booking/history', [BookingController::class, 'history'])->name('booking.history'); // riwayat
+});
 });
