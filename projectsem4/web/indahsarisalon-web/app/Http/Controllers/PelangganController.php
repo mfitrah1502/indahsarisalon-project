@@ -48,6 +48,7 @@ class PelangganController extends Controller
             'email'    => $request->email,
             'password' => Hash::make($request->password),
             'role'     => 'pelanggan', // selalu pelanggan
+            'type'     => 'pelanggan',
             'status'   => $request->status,
         ]);
 
@@ -67,6 +68,7 @@ class PelangganController extends Controller
         $pelanggan->username = $request->username;
         $pelanggan->email    = $request->email;
         $pelanggan->status   = $request->status;
+        $pelanggan->type     = 'pelanggan';
 
         if ($request->password) {
             $pelanggan->password = Hash::make($request->password);

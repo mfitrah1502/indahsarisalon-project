@@ -44,14 +44,19 @@
                         <li class="pc-item"><a class="pc-link" href="#!">Pengeluaran</a></li>
                     </ul>
                 </li>
-                <li class="pc-item pc-hasmenu">
-                    <a class="pc-link"><span class="pc-micon"><i class="ti ti-calendar"></i></span><span
-                            class="pc-mtext">Booking</span><span class="pc-arrow"><i
-                                data-feather="chevron-right"></i></span></a>
+                <li class="pc-item pc-hasmenu {{ request()->is('booking*') ? 'active pc-trigger' : '' }}">
+                    <a class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-calendar"></i></span>
+                        <span class="pc-mtext">Booking</span>
+                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                    </a>
                     <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="#!">Pemesanan</a></li>
-                        <li class="pc-item"><a class="pc-link" href="#!">Status Pemesanan</a></li>
-                        <li class="pc-item"><a class="pc-link" href="#!">Riwayat Pemesanan</a></li>
+                        <li class="pc-item"><a class="pc-link {{ request()->is('booking') ? 'active' : '' }}"
+                                href="{{ route('booking.index') }}">Book An Appointment</a></li>
+                        <li class="pc-item"><a class="pc-link {{ request()->is('booking/select*') ? 'active' : '' }}"
+                                href="{{ route('booking.select', ['treatmentId' => 1]) }}">Status Pemesanan</a></li>
+                        <li class="pc-item"><a class="pc-link {{ request()->is('booking/history') ? 'active' : '' }}"
+                                href="{{ route('booking.history') }}">Riwayat Pemesanan</a></li>
                     </ul>
                 </li>
 
