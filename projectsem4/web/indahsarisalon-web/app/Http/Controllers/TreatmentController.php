@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use GuzzleHttp\Client;
 use App\Models\Treatment; // Model utama treatment
 use App\Models\TreatmentDetail; // Detail treatment
 use App\Models\Category; // Opsional jika kategori dibuat terpisah
@@ -107,13 +109,25 @@ class TreatmentController extends Controller
     $treatment->is_promo = $request->has('is_promo') ? 1 : 0;
     $treatment->promo_type = $request->promo_type;
     $treatment->promo_value = $request->promo_value;
-    if ($request->hasFile('image')) {
-    $file = $request->file('image');
-    $filename = time() . '.' . $file->getClientOriginalExtension();
-    $file->storeAs('public/treatments', $filename);
+    // Upload gambar ke Supabase
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
 
-    $treatment->image = $filename;
-}
+            $fileContents = file_get_contents($file->getRealPath());
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . env('SUPABASE_SERVICE_KEY'),
+                'apikey' => env('SUPABASE_SERVICE_KEY'),
+                'Content-Type' => 'application/octet-stream',
+            ])->withBody($fileContents, 'application/octet-stream')
+            ->post(env('SUPABASE_URL') . '/storage/v1/object/' . env('SUPABASE_BUCKET') . '/' . $filename, file_get_contents($file));
+
+            if ($response->failed()) {
+                return back()->withErrors(['image' => 'Gagal upload ke Supabase: ' . $response->body()]);
+            }
+
+            $treatment->image = $filename;
+        }
     $treatment->save();
 
     // Simpan detail treatment
@@ -146,19 +160,33 @@ class TreatmentController extends Controller
         $treatment->is_promo = $request->has('is_promo') ? 1 : 0;
         $treatment->promo_type = $request->promo_type;
         $treatment->promo_value = $request->promo_value;
+         // Upload gambar baru
         if ($request->hasFile('image')) {
+            // Hapus gambar lama di Supabase (opsional)
+            if ($treatment->image) {
+                Http::withHeaders([
+                    'Authorization' => 'Bearer ' . env('SUPABASE_SERVICE_KEY'),
+                    'apikey' => env('SUPABASE_SERVICE_KEY'),
+                ])->delete(env('SUPABASE_URL') . '/storage/v1/object/' . env('SUPABASE_BUCKET') . '/' . $treatment->image);
+            }
 
-    // Hapus gambar lama (opsional tapi bagus)
-    if ($treatment->image && file_exists(storage_path('app/public/treatments/' . $treatment->image))) {
-        unlink(storage_path('app/public/treatments/' . $treatment->image));
-    }
+            $file = $request->file('image');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
 
-    $file = $request->file('image');
-    $filename = time() . '.' . $file->getClientOriginalExtension();
-    $file->storeAs('public/treatments', $filename);
+            $fileContents = file_get_contents($file->getRealPath());
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . env('SUPABASE_SERVICE_KEY'),
+                'apikey' => env('SUPABASE_SERVICE_KEY'),
+                'Content-Type' => 'application/octet-stream',
+            ])->withBody($fileContents, 'application/octet-stream')
+            ->post(env('SUPABASE_URL') . '/storage/v1/object/' . env('SUPABASE_BUCKET') . '/' . $filename, file_get_contents($file));
 
-    $treatment->image = $filename;
-}
+            if ($response->failed()) {
+                return back()->withErrors(['image' => 'Gagal upload ke Supabase: ' . $response->body()]);
+            }
+
+            $treatment->image = $filename;
+        }
         $treatment->save();
 
         // Hapus detail lama

@@ -29,7 +29,8 @@
                         <li class="pc-item"><a href="{{ route('karyawan.index') }}" class="pc-link">Manajemen
                                 Karyawan</a>
                         </li>
-                        <li class="pc-item"><a class="pc-link" href="#!">Manajemen Pelanggan</a></li>
+                        <li class="pc-item"><a href="{{ route('pelanggan.index') }}" class="pc-link">Manajemen
+                                Pelanggan</a></li>
                         <li class="pc-item"><a href="{{ route('treatment.index') }}" class="pc-link">Manajemen
                                 Treatment</a></li>
                     </ul>
