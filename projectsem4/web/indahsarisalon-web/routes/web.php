@@ -55,6 +55,9 @@ Route::post('/reset-password/otp', [PasswordResetController::class, 'resetPasswo
 // Routes yang membutuhkan auth + session timeout
 // ------------------------------
 Route::middleware(['auth', 'session.timeout'])->group(function () {
+    Route::get('/profile', function () {
+    return view('profile.index');
+})->middleware('auth')->name('profile');
 
     // ------------------------------
     // Dashboard
