@@ -9,22 +9,20 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->enum('role', ['admin','karyawan','pelanggan'])
-              ->default('pelanggan')
-              ->after('password');
+            $table->string('type')->nullable()->after('role'); 
+            $table->string('kategori')->nullable()->after('type'); 
+            // type: karyawan/pelanggan
+            // kategori: stylist/biasa, nullable karena admin tidak punya kategori
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role');
+            $table->dropColumn(['type', 'kategori']);
         });
     }
 };

@@ -12,7 +12,7 @@ class KaryawanController extends Controller
     public function index(Request $request)
     {
 
-        $query = User::whereIn('role', ['admin', 'kasir']); // ambil admin & kasir
+        $query = User::whereIn('role', ['admin', 'karyawan']); // ambil admin & kasir
 
 
         // Jika ada pencarian
@@ -41,7 +41,8 @@ class KaryawanController extends Controller
         'username' => 'required|string|unique:users',
         'email' => 'required|email|unique:users',
         'password' => 'required|string|min:6',
-        'role' => 'required|in:admin,kasir', 
+        'role' => 'required|in:admin,karyawan', 
+        'kategori' => 'required_if:role,karyawan|in:,biasa',
     ]);
 
     User::create([
@@ -50,6 +51,8 @@ class KaryawanController extends Controller
         'email' => $request->email,
         'password' => Hash::make($request->password),
         'role' => $request->role,       // simpan role dari form
+        'type' => 'karyawan',
+         'kategori' => $request->role === 'karyawan' ? $request->kategori : null,
         'status' => $request->status ?? 'aktif',
     ]);
 
@@ -67,14 +70,17 @@ class KaryawanController extends Controller
         'name' => 'required|string|max:255',
         'username' => 'required|string|unique:users,username,'.$karyawan->id,
         'email' => 'required|email|unique:users,email,'.$karyawan->id,
-        'role' => 'required|in:admin,kasir', // validasi role
+        'role' => 'required|in:admin,karyawan', // validasi role
+        'kategori' => 'required_if:role,karyawan|in:senior,junior',
     ]);
 
     $karyawan->update([
         'name' => $request->name,
         'username' => $request->username,
         'email' => $request->email,
-        'role' => $request->role,       // update role
+        'role' => $request->role,   
+        'kategori' => $request->role === 'karyawan' ? $request->kategori : null,
+        'type' => 'karyawan',    // update role
         'status' => $request->status ?? 'aktif',
     ]);
 

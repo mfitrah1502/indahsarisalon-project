@@ -10,14 +10,13 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // ==============================
-    // WEB LOGIN (TETAP DIPAKAI)
-    // ==============================
+    // Menampilkan form login
     public function showLoginForm()
     {
-        return view('auth');
+        return view('auth'); // resources/views/login.blade.php
     }
 
+    // Memproses login
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -27,79 +26,48 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-
-            if (Auth::user()->role == 'admin' || Auth::user()->role == 'kasir') {
-                return redirect()->route('dashboard');
-            } else {
-                return redirect()->route('dashboard.user');
-            }
+            if (Auth::user()->role == 'admin' || Auth::user()->role == 'karyawan') {
+        return redirect()->route('dashboard'); // dashboard admin/kasir
+    } else {
+        return redirect()->route('dashboard.user'); // dashboard pelanggan
+    }
         }
 
         return back()->with('error', 'Username atau password salah!');
     }
 
-    // ==============================
-    // 🔥 API LOGIN (UNTUK FLUTTER)
-    // ==============================
-    public function loginApi(Request $request)
-    {
-        if (!Auth::attempt([
-            'username' => $request->username,
-            'password' => $request->password
-        ])) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Login gagal'
-            ], 401);
-        }
-
-        $user = Auth::user();
-
-        return response()->json([
-            'status' => 'success',
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'username' => $user->username,
-                'role' => $user->role
-            ]
-        ]);
-    }
-
-    // ==============================
-    // REGISTER (WEB)
-    // ==============================
+    // Menampilkan form register
     public function showRegisterForm()
     {
-        return view('auth');
+        return view('auth'); // resources/views/register.blade.php
     }
 
+    // Memproses register
     public function register(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users',
-            'username' => 'required|string|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|unique:users',
+        'username' => 'required|string|unique:users',
+        'password' => 'required|string|min:6|confirmed',
+        'email_verified_at' => now(),
+    'remember_token' => Str::random(60),
+    ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'username' => $request->username,
-            'password' => Hash::make($request->password),
-            'role' => $request->role ?? 'pelanggan',
-            'email_verified_at' => now(),
-            'remember_token' => Str::random(60),
-        ]);
+    $user = User::create([
+        'name' => $request->name,                   // wajib
+        'email' => $request->email,
+        'username' => $request->username,
+        'password' => Hash::make($request->password),
+        'role' => $request->role ?? 'pelanggan',
+        'email_verified_at' => now(),
+        'remember_token' => Str::random(60),
+    ]);
 
-        return redirect()->route('auth')
-            ->with('success', 'Akun berhasil dibuat. Silahkan login!');
-    }
+    return redirect()->route('auth')->with('success', 'Akun berhasil dibuat. Silahkan login!');
+}
 
-    // ==============================
-    // LOGOUT
-    // ==============================
+    // Logout
     public function logout(Request $request)
     {
         Auth::logout();

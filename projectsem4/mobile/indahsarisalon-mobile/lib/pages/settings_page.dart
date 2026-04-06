@@ -162,6 +162,13 @@ class _SettingsPageState extends State<SettingsPage> {
                             onTap: () {},
                           ),
                           _buildSettingTile(
+                            icon: Icons.groups_outlined,
+                            title: "Manage Team",
+                            mainTextColor: mainTextColor,
+                            iconBoxBg: iconBoxBg,
+                            onTap: () {},
+                          ),
+                          _buildSettingTile(
                             icon: Icons.lock_outline,
                             title: "Change Password",
                             mainTextColor: mainTextColor,
