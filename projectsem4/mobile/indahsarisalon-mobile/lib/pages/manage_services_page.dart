@@ -73,6 +73,39 @@ class _ManageServicesPageState extends State<ManageServicesPage> {
       body: SafeArea(
         child: Column(
           children: [
+            // Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => const HomePage()),
+                        (route) => false,
+                      );
+                    },
+                    child: Icon(Icons.arrow_back, color: darkBlue, size: 28),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 28.0),
+                        child: Text(
+                          "Manage Services",
+                          style: TextStyle(
+                            color: darkBlue,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             Expanded(
               child: Stack(
                 children: [
@@ -81,17 +114,6 @@ class _ManageServicesPageState extends State<ManageServicesPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 12),
-                        Text(
-                          "Manage Services",
-                          style: TextStyle(
-                            color: darkBlue,
-                            fontSize: 32,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
 
                         // Search Bar
                         Container(
@@ -369,7 +391,7 @@ class _ManageServicesPageState extends State<ManageServicesPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(0, "HOME", Icons.home_outlined),
+              _buildNavItem(0, "HOME", Icons.home_filled),
               _buildNavItem(1, "BOOKING", Icons.calendar_today_outlined), 
               _buildNavItem(2, "SERVICES", Icons.content_cut_rounded), // Active
               _buildNavItem(3, "REPORT", Icons.bar_chart_rounded),
@@ -384,36 +406,6 @@ class _ManageServicesPageState extends State<ManageServicesPage> {
   Widget _buildNavItem(int index, String label, IconData icon) {
     bool isSelected = _selectedIndex == index;
 
-    if (isSelected) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: darkBlue,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: Colors.white,
-              size: 22,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-    
     return GestureDetector(
       onTap: () {
         if (index == 0) {
@@ -445,7 +437,7 @@ class _ManageServicesPageState extends State<ManageServicesPage> {
         children: [
           Icon(
             icon,
-            color: mutedText,
+            color: isSelected ? darkBlue : mutedText,
             size: 26,
           ),
           const SizedBox(height: 6),
@@ -453,8 +445,8 @@ class _ManageServicesPageState extends State<ManageServicesPage> {
             label,
             style: TextStyle(
               fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: mutedText,
+              fontWeight: FontWeight.w800,
+              color: isSelected ? darkBlue : mutedText,
               letterSpacing: 0.5,
             ),
           ),

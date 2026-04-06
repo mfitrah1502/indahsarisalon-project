@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'home_page.dart';
 import 'booking_page.dart';
 import 'booking_list_page.dart';
+import 'manage_team_page.dart';
 import 'manage_services_page.dart';
-import 'manage_services_page.dart';
+import 'edit_profile_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -16,6 +17,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool isDarkMode = false; // Default to light mode
   int _selectedIndex = 4; // Settings is active
+  String _selectedLanguage = 'English'; // Default Language
 
   @override
   Widget build(BuildContext context) {
@@ -159,14 +161,24 @@ class _SettingsPageState extends State<SettingsPage> {
                             title: "Edit Profile",
                             mainTextColor: mainTextColor,
                             iconBoxBg: iconBoxBg,
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const EditProfilePage()),
+                              );
+                            },
                           ),
                           _buildSettingTile(
                             icon: Icons.groups_outlined,
                             title: "Manage Team",
                             mainTextColor: mainTextColor,
                             iconBoxBg: iconBoxBg,
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const ManageTeamPage()),
+                              );
+                            },
                           ),
                           _buildSettingTile(
                             icon: Icons.lock_outline,
@@ -225,14 +237,16 @@ class _SettingsPageState extends State<SettingsPage> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  "English",
+                                  _selectedLanguage,
                                   style: TextStyle(color: mutedText, fontSize: 13),
                                 ),
                                 const SizedBox(width: 8),
                                 Icon(Icons.arrow_forward_ios, size: 14, color: mutedText),
                               ],
                             ),
-                            onTap: () {},
+                            onTap: () {
+                              _showLanguagePicker(context);
+                            },
                           ),
                         ],
                       ),
@@ -288,7 +302,7 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(0, "HOME", Icons.home_outlined, activeNavBg, mutedText),
+              _buildNavItem(0, "HOME", Icons.home_filled, activeNavBg, mutedText),
               _buildNavItem(1, "BOOKING", Icons.calendar_today_outlined, activeNavBg, mutedText),
               _buildNavItem(2, "SERVICES", Icons.content_cut_rounded, activeNavBg, mutedText),
               _buildNavItem(3, "REPORT", Icons.bar_chart_rounded, activeNavBg, mutedText),
@@ -352,39 +366,64 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildNavItem(int index, String label, IconData icon, [Color activeNavBg = Colors.blue, Color mutedText = Colors.grey]) {
-    final isSelected = _selectedIndex == index;
-    
-    if (isSelected) {
-      // New selected tab style per the settings mockup
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: activeNavBg,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: Colors.white,
-              size: 22,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-                letterSpacing: 0.5,
+  void _showLanguagePicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      backgroundColor: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+      builder: (ctx) {
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text(
+                  "Select Language",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : const Color(0xFF0F172A),
+                  ),
+                ),
               ),
-            ),
-          ],
-        ),
-      );
-    }
+              const SizedBox(height: 16),
+              ListTile(
+                title: Text("English", style: TextStyle(color: isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w500)),
+                trailing: _selectedLanguage == 'English' ? const Icon(Icons.check_circle, color: Color(0xFF02365A)) : const Icon(Icons.circle_outlined, color: Colors.grey),
+                onTap: () {
+                  setState(() {
+                    _selectedLanguage = 'English';
+                  });
+                  Navigator.pop(ctx);
+                },
+              ),
+              ListTile(
+                title: Text("Indonesia", style: TextStyle(color: isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w500)),
+                trailing: _selectedLanguage == 'Indonesia' ? const Icon(Icons.check_circle, color: Color(0xFF02365A)) : const Icon(Icons.circle_outlined, color: Colors.grey),
+                onTap: () {
+                  setState(() {
+                    _selectedLanguage = 'Indonesia';
+                  });
+                  Navigator.pop(ctx);
+                },
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildNavItem(int index, String label, IconData icon, [Color? activeNavBgColor, Color? mutedTextColor]) {
+    final isSelected = _selectedIndex == index;
+    final selectedColor = activeNavBgColor ?? Colors.blue;
+    final unselectedColor = mutedTextColor ?? Colors.grey;
     
     return GestureDetector(
       onTap: () {
@@ -419,7 +458,7 @@ class _SettingsPageState extends State<SettingsPage> {
         children: [
           Icon(
             icon,
-            color: mutedText,
+            color: isSelected ? selectedColor : unselectedColor,
             size: 26,
           ),
           const SizedBox(height: 6),
@@ -427,8 +466,8 @@ class _SettingsPageState extends State<SettingsPage> {
             label,
             style: TextStyle(
               fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: mutedText,
+              fontWeight: FontWeight.w800,
+              color: isSelected ? selectedColor : unselectedColor,
               letterSpacing: 0.5,
             ),
           ),

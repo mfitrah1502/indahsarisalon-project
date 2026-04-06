@@ -66,33 +66,33 @@ class _BookingListPageState extends State<BookingListPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          // Navigate back to HomePage as requested
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(builder: (context) => const HomePage()),
-                            (route) => false,
-                          );
-                        },
-                        child: Icon(Icons.arrow_back, color: darkBlue, size: 28),
-                      ),
-                      const SizedBox(width: 16),
-                      Text(
-                        "Bookings",
-                        style: TextStyle(
-                          color: darkBlue,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
+                  GestureDetector(
+                    onTap: () {
+                      // Navigate back to HomePage as requested
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => const HomePage()),
+                        (route) => false,
+                      );
+                    },
+                    child: Icon(Icons.arrow_back, color: darkBlue, size: 28),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 28.0),
+                        child: Text(
+                          "Bookings",
+                          style: TextStyle(
+                            color: darkBlue,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                  Icon(Icons.account_circle_outlined, color: darkBlue, size: 28),
                 ],
               ),
             ),
@@ -320,7 +320,7 @@ class _BookingListPageState extends State<BookingListPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(0, "HOME", Icons.home_outlined),
+              _buildNavItem(0, "HOME", Icons.home_filled),
               _buildNavItem(1, "BOOKING", Icons.calendar_today), 
               _buildNavItem(2, "SERVICES", Icons.content_cut_rounded),
               _buildNavItem(3, "REPORT", Icons.bar_chart_rounded),
@@ -335,35 +335,7 @@ class _BookingListPageState extends State<BookingListPage> {
   Widget _buildNavItem(int index, String label, IconData icon) {
     final isSelected = _selectedIndex == index;
     
-    if (isSelected) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: darkBlue,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: Colors.white,
-              size: 22,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+
     
     return GestureDetector(
       onTap: () {
@@ -396,7 +368,7 @@ class _BookingListPageState extends State<BookingListPage> {
         children: [
           Icon(
             icon,
-            color: mutedText,
+            color: isSelected ? darkBlue : mutedText,
             size: 26,
           ),
           const SizedBox(height: 6),
@@ -404,8 +376,8 @@ class _BookingListPageState extends State<BookingListPage> {
             label,
             style: TextStyle(
               fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: mutedText,
+              fontWeight: FontWeight.w800,
+              color: isSelected ? darkBlue : mutedText,
               letterSpacing: 0.5,
             ),
           ),

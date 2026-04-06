@@ -61,13 +61,19 @@ class _BookingPageState extends State<BookingPage> {
                     ),
                     child: Icon(Icons.arrow_back, color: darkBlue, size: 28),
                   ),
-                  const SizedBox(width: 16),
-                  Text(
-                    "Booking",
-                    style: TextStyle(
-                      color: darkBlue,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 28.0),
+                        child: Text(
+                          "Booking",
+                          style: TextStyle(
+                            color: darkBlue,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -412,7 +418,7 @@ class _BookingPageState extends State<BookingPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(0, "HOME", Icons.home_outlined),
+              _buildNavItem(0, "HOME", Icons.home_filled),
               _buildNavItem(1, "BOOKING", Icons.calendar_today), // Solid calendar
               _buildNavItem(2, "SERVICES", Icons.content_cut_rounded),
               _buildNavItem(3, "REPORT", Icons.bar_chart_rounded),
@@ -427,35 +433,7 @@ class _BookingPageState extends State<BookingPage> {
   Widget _buildNavItem(int index, String label, IconData icon) {
     final isSelected = _selectedIndex == index;
     
-    if (isSelected) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: darkBlue,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: Colors.white,
-              size: 22,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+
     
     return GestureDetector(
       onTap: () {
@@ -497,7 +475,7 @@ class _BookingPageState extends State<BookingPage> {
         children: [
           Icon(
             icon,
-            color: mutedText,
+            color: isSelected ? darkBlue : mutedText,
             size: 26,
           ),
           const SizedBox(height: 6),
@@ -505,8 +483,8 @@ class _BookingPageState extends State<BookingPage> {
             label,
             style: TextStyle(
               fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: mutedText,
+              fontWeight: FontWeight.w800,
+              color: isSelected ? darkBlue : mutedText,
               letterSpacing: 0.5,
             ),
           ),

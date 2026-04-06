@@ -8,7 +8,7 @@ class NotificationsPage extends StatefulWidget {
   State<NotificationsPage> createState() => _NotificationsPageState();
 }
 
-class _NotificationsPageState extends State<NotificationsPage> {
+class _NotificationsPageState extends State<NotificationsPage> {1
   int _selectedIndex = 0; // Same as home for demonstration
   final Color darkBlue = const Color(0xFF02365A);
   final Color scaffoldBg = const Color(0xFFF6F8FA);

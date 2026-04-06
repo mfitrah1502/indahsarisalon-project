@@ -20,33 +20,42 @@ class _SelectServicesPageState extends State<SelectServicesPage> {
 
   int _selectedIndex = 1; // 1 is BOOKING in Bottom Nav
 
+  String _selectedCategory = 'All';
+  String _searchQuery = '';
+  final List<String> _categories = ['All', 'Hair', 'Face', 'Nails', 'Treatment'];
+
   final List<Map<String, dynamic>> _services = [
     {
       "title": "Haircut & Styling",
+      "category": "HAIR",
       "duration": "45 mins",
       "price": "\$45.00",
       "selected": false,
     },
     {
       "title": "Advanced Facial",
+      "category": "FACE",
       "duration": "60 mins",
       "price": "\$80.00",
       "selected": true,
     },
     {
       "title": "Manicure Deluxe",
+      "category": "NAILS",
       "duration": "30 mins",
       "price": "\$35.00",
       "selected": false,
     },
     {
       "title": "Pedicure Therapy",
+      "category": "NAILS",
       "duration": "40 mins",
       "price": "\$40.00",
       "selected": false,
     },
     {
       "title": "Hair Coloring",
+      "category": "HAIR",
       "duration": "120 mins",
       "price": "\$120.00",
       "selected": false,
@@ -55,6 +64,15 @@ class _SelectServicesPageState extends State<SelectServicesPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Filter services based on category and search query
+    final filteredServices = _services.where((s) {
+      final matchesCategory = _selectedCategory == 'All' || 
+          s["category"].toString().toLowerCase() == _selectedCategory.toLowerCase();
+      final matchesSearch = s["title"].toString().toLowerCase().contains(_searchQuery.toLowerCase());
+      
+      return matchesCategory && matchesSearch;
+    }).toList();
+
     final selectedServices = _services.where((s) => s["selected"] == true).toList();
     double totalPrice = 0.0;
     int totalMins = 0;
@@ -72,33 +90,33 @@ class _SelectServicesPageState extends State<SelectServicesPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          // Handle back navigation to BookingPage
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(builder: (context) => const BookingPage()),
-                            (route) => false,
-                          );
-                        },
-                        child: Icon(Icons.arrow_back, color: darkBlue, size: 28),
-                      ),
-                      const SizedBox(width: 16),
-                      Text(
-                        "Select Services",
-                        style: TextStyle(
-                          color: darkBlue,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
+                  GestureDetector(
+                    onTap: () {
+                      // Handle back navigation to BookingPage
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => const BookingPage()),
+                        (route) => false,
+                      );
+                    },
+                    child: Icon(Icons.arrow_back, color: darkBlue, size: 28),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 28.0),
+                        child: Text(
+                          "Select Services",
+                          style: TextStyle(
+                            color: darkBlue,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                  Icon(Icons.account_circle_outlined, color: darkBlue, size: 28)
                 ],
               ),
             ),
@@ -114,23 +132,66 @@ class _SelectServicesPageState extends State<SelectServicesPage> {
                       children: [
                         // Search Bar
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
                             color: const Color(0xFFE2E8F0).withOpacity(0.5),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.search, color: mutedText, size: 22),
-                              const SizedBox(width: 12),
-                              Text(
-                                "Search for a service...",
-                                style: TextStyle(
-                                  color: mutedText,
-                                  fontSize: 15,
-                                ),
+                          child: TextField(
+                            onChanged: (value) {
+                              setState(() {
+                                _searchQuery = value;
+                              });
+                            },
+                            decoration: InputDecoration(
+                              icon: Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: Icon(Icons.search, color: mutedText, size: 20),
                               ),
-                            ],
+                              hintText: "Search for a service...",
+                              hintStyle: TextStyle(
+                                color: mutedText,
+                                fontSize: 14,
+                              ),
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Category Filters
+                        SizedBox(
+                          height: 36,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: _categories.length,
+                            separatorBuilder: (context, index) => const SizedBox(width: 8),
+                            itemBuilder: (context, index) {
+                              final cat = _categories[index];
+                              final isSelected = _selectedCategory == cat;
+                              return GestureDetector(
+                                onTap: () => setState(() => _selectedCategory = cat),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  decoration: BoxDecoration(
+                                    color: isSelected ? darkBlue : Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: isSelected ? darkBlue : const Color(0xFFE2E8F0),
+                                    ),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    cat,
+                                    style: TextStyle(
+                                      color: isSelected ? Colors.white : mutedText,
+                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -139,14 +200,14 @@ class _SelectServicesPageState extends State<SelectServicesPage> {
                         ListView.separated(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: _services.length + 1, // +1 for explicit bottom padding to not hide behind continue button
+                          itemCount: filteredServices.length + 1, // +1 for explicit bottom padding to not hide behind continue button
                           separatorBuilder: (context, index) => const SizedBox(height: 16),
                           itemBuilder: (context, index) {
-                            if (index == _services.length) {
+                            if (index == filteredServices.length) {
                               return const SizedBox(height: 80); // padding for floating button
                             }
 
-                            final service = _services[index];
+                            final service = filteredServices[index];
                             final isSelected = service["selected"] as bool;
 
                             return Container(
@@ -358,7 +419,7 @@ class _SelectServicesPageState extends State<SelectServicesPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(0, "HOME", Icons.home_outlined),
+              _buildNavItem(0, "HOME", Icons.home_filled),
               _buildNavItem(1, "BOOKING", Icons.calendar_today), // Solid calendar
               _buildNavItem(2, "SERVICES", Icons.content_cut_rounded),
               _buildNavItem(3, "REPORT", Icons.bar_chart_rounded),
@@ -373,35 +434,7 @@ class _SelectServicesPageState extends State<SelectServicesPage> {
   Widget _buildNavItem(int index, String label, IconData icon) {
     final isSelected = _selectedIndex == index;
     
-    if (isSelected) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: darkBlue,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: Colors.white,
-              size: 22,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+
     
     return GestureDetector(
       onTap: () {
@@ -440,7 +473,7 @@ class _SelectServicesPageState extends State<SelectServicesPage> {
         children: [
           Icon(
             icon,
-            color: mutedText,
+            color: isSelected ? darkBlue : mutedText,
             size: 26,
           ),
           const SizedBox(height: 6),
@@ -448,8 +481,8 @@ class _SelectServicesPageState extends State<SelectServicesPage> {
             label,
             style: TextStyle(
               fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: mutedText,
+              fontWeight: FontWeight.w800,
+              color: isSelected ? darkBlue : mutedText,
               letterSpacing: 0.5,
             ),
           ),
