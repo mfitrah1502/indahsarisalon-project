@@ -42,7 +42,7 @@ class KaryawanController extends Controller
         'email' => 'required|email|unique:users',
         'password' => 'required|string|min:6',
         'role' => 'required|in:admin,karyawan', 
-        'kategori' => 'required_if:role,karyawan|in:stylist,biasa',
+        'kategori' => 'required_if:role,karyawan|in:,biasa',
     ]);
 
     User::create([
@@ -71,7 +71,7 @@ class KaryawanController extends Controller
         'username' => 'required|string|unique:users,username,'.$karyawan->id,
         'email' => 'required|email|unique:users,email,'.$karyawan->id,
         'role' => 'required|in:admin,karyawan', // validasi role
-        'kategori' => 'required_if:role,karyawan|in:stylist,biasa',
+        'kategori' => 'required_if:role,karyawan|in:senior,junior',
     ]);
 
     $karyawan->update([
