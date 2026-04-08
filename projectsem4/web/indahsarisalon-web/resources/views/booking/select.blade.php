@@ -109,22 +109,43 @@
                                     </li>
                                 @endforeach
                             </ul>
-                            <strong>Total: Rp {{ number_format($treatment->details->sum('price')) }}</strong>
+                            <strong>Total: <span id="totalPriceDisplay1">Rp
+                                    {{ number_format($treatment->details->sum('price')) }}</span></strong>
                         </div>
 
                         <form id="bookingForm">
                             <div class="row">
 
-                                <!-- STYLIST -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">👩‍🎨 Stylist</label>
-                                    <select name="stylist_id" id="stylist" class="form-select" required>
-                                        <option value="">-- Pilih Stylist --</option>
-                                        @foreach($stylists as $stylist)
-                                            <option value="{{ $stylist->id }}">{{ $stylist->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                                @php
+                                    $hasStylistPrice = $treatment->details->contains('has_stylist_price', true);
+                                @endphp
+
+                                @if($hasStylistPrice)
+                                    <!-- KATEGORI STYLIST -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">🔖 Kategori Stylist</label>
+                                        <select id="stylist_category" class="form-select">
+                                            <option value="">-- Semua Kategori --</option>
+                                            <option value="senior">Senior</option>
+                                            <option value="junior">Junior</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- STYLIST -->
+                                    <div class="col-md-6 mb-3" id="stylist_container" style="display: none;">
+                                        <label class="form-label">👩‍🎨 Stylist</label>
+                                        <select name="stylist_id" id="stylist" class="form-select" required>
+                                            <option value="">-- Pilih Stylist --</option>
+                                            @foreach($stylists as $stylist)
+                                                <option value="{{ $stylist->id }}"
+                                                    data-kategori="{{ strtolower($stylist->kategori) }}">
+                                                    {{ $stylist->name }}
+                                                    {{ $stylist->kategori ? '(' . ucfirst($stylist->kategori) . ')' : '' }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @endif
 
                                 <!-- TANGGAL -->
                                 <div class="col-md-3 mb-3">
@@ -162,7 +183,8 @@
                             <p><strong>Waktu:</strong> <span id="summaryDatetime"></span></p>
 
                             <hr>
-                            <h5>Total: Rp {{ number_format($treatment->details->sum('price')) }}</h5>
+                            <h5>Total: <span id="totalPriceDisplay2">Rp
+                                    {{ number_format($treatment->details->sum('price')) }}</span></h5>
                         </div>
                     </div>
 
@@ -245,15 +267,16 @@
         const prevBtn = document.getElementById('prevStep');
 
         function showStep(step) {
+            updateStepper(step); // Memanggil update visual untuk step indicator lingkaran
             for (let i = 1; i <= totalSteps; i++) {
                 const tab = document.getElementById('step' + i);
-                const btn = document.getElementById('step' + i + '-tab');
+                const btn = document.getElementById('step' + i + '-tab'); // Boleh null jika tidak pakai btn
                 if (i === step) {
-                    tab.classList.add('show', 'active');
-                    btn.classList.add('active');
+                    if (tab) tab.classList.add('show', 'active');
+                    if (btn) btn.classList.add('active');
                 } else {
-                    tab.classList.remove('show', 'active');
-                    btn.classList.remove('active');
+                    if (tab) tab.classList.remove('show', 'active');
+                    if (btn) btn.classList.remove('active');
                 }
             }
 
@@ -263,26 +286,101 @@
 
         prevBtn.addEventListener('click', () => { currentStep--; showStep(currentStep); });
         nextBtn.addEventListener('click', () => {
-            if (currentStep === 1) {
-                const s = document.getElementById('stylist');
-                const d = document.getElementById('reservation_date');
-                const time = document.getElementById('reservation_time');
+                if (currentStep === 1) {
+                    const s = document.getElementById('stylist');
+                    const d = document.getElementById('reservation_date');
+                    const time = document.getElementById('reservation_time');
 
-                // isi ringkasan
-                document.getElementById('summaryStylist').innerText = s.selectedOptions[0].text;
-                document.getElementById('summaryDatetime').innerText = d.value + ' ' + time.value;
+                    // isi ringkasan
+                    let stylistNameText = (s && s.selectedIndex > 0) ? s.selectedOptions[0].text : '-';
+                    document.getElementById('summaryStylist').innerText = stylistNameText;
+                    document.getElementById('summaryDatetime').innerText = d.value + ' ' + time.value;
 
-                // isi hidden form payment
-                document.getElementById('paymentStylist').value = s.value;
-                document.getElementById('paymentDate').value = d.value;
-                document.getElementById('paymentTime').value = time.value;
-            }
+                    // isi hidden form payment
+                    document.getElementById('paymentStylist').value = s ? s.value : '';
+                    document.getElementById('paymentDate').value = d.value;
+                    document.getElementById('paymentTime').value = time.value;
+                }
             currentStep++;
             showStep(currentStep);
         });
 
         // Inisialisasi step pertama
         showStep(currentStep);
+
+        // Logic Filter Kategori Stylist
+        let stylistCategoryEl = document.getElementById('stylist_category');
+        if (stylistCategoryEl) {
+            stylistCategoryEl.addEventListener('change', function () {
+                let selectedCategory = this.value.toLowerCase();
+                let stylistContainer = document.getElementById('stylist_container');
+                let stylistSelect = document.getElementById('stylist');
+                let options = stylistSelect.querySelectorAll('option');
+
+                // Reset seleksi
+                stylistSelect.value = "";
+
+                // Tampilkan/Sembunyikan container dropdown stylist
+                if (selectedCategory === "") {
+                    stylistContainer.style.display = 'none';
+                } else {
+                    stylistContainer.style.display = 'block';
+                }
+
+                options.forEach(option => {
+                    // Jangan sembunyikan option default
+                    if (option.value === "") {
+                        option.style.display = 'block';
+                        return;
+                    }
+
+                    let kategoriOption = option.getAttribute('data-kategori');
+
+                    // Jika tidak ada kategori yang dipilih, tampilkan semua (meskipun sudah di hide di level container)
+                    if (selectedCategory === "") {
+                        option.style.display = 'block';
+                    } else {
+                        // Sematkan filter sesuai kategori
+                        if (kategoriOption === selectedCategory) {
+                            option.style.display = 'block';
+                        } else {
+                            option.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        }
+
+        // Update harga berdasarkan stylist yang dipilih
+        let stylistEl = document.getElementById('stylist');
+        if (stylistEl) {
+            stylistEl.addEventListener('change', function () {
+                let selectedOption = this.options[this.selectedIndex];
+                if (!selectedOption) return;
+
+                let kategori = selectedOption.getAttribute('data-kategori');
+                let details = @json($treatment->details);
+                let newPrice = 0;
+
+                details.forEach(function(detail) {
+                    if (detail.has_stylist_price && kategori) {
+                        if (kategori === 'senior') {
+                            newPrice += parseInt(detail.price_senior || 0);
+                        } else if (kategori === 'junior') {
+                            newPrice += parseInt(detail.price_junior || 0);
+                        } else {
+                            newPrice += parseInt(detail.price || 0);
+                        }
+                    } else {
+                        newPrice += parseInt(detail.price || 0);
+                    }
+                });
+
+                let formattedPrice = 'Rp ' + new Intl.NumberFormat('id-ID').format(newPrice);
+                document.getElementById('totalPriceDisplay1').innerText = formattedPrice;
+                document.getElementById('totalPriceDisplay2').innerText = formattedPrice;
+            });
+        }
 
     </script>
 @endsection

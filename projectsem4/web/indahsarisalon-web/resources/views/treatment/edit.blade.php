@@ -83,15 +83,42 @@
                         <h5>Detail Treatment</h5>
                         <div id="details_wrapper">
                             @foreach($treatment->details as $index => $detail)
-                                <div class="detail_item mb-3">
-                                    <input type="text" name="details[{{ $index }}][name]" class="form-control mb-1"
+                                <div class="detail_item mb-3 p-3 border rounded">
+                                    <input type="text" name="details[{{ $index }}][name]" class="form-control mb-2"
                                         placeholder="Nama Detail" value="{{ $detail->name }}" required>
-                                    <input type="number" name="details[{{ $index }}][duration]" class="form-control mb-1"
+                                    <input type="number" name="details[{{ $index }}][duration]" class="form-control mb-2"
                                         placeholder="Durasi (menit)" value="{{ $detail->duration }}" required>
-                                    <input type="number" name="details[{{ $index }}][price]" class="form-control mb-1"
-                                        placeholder="Harga" value="{{ $detail->price }}" required>
-                                    <textarea name="details[{{ $index }}][description]" class="form-control"
+
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input stylist-price-toggle" 
+                                            name="details[{{ $index }}][has_stylist_price]" value="1" 
+                                            id="has_stylist_price_{{ $index }}" 
+                                            {{ $detail->has_stylist_price ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="has_stylist_price_{{ $index }}">Aktifkan Harga Khusus Stylist (Senior/Junior)</label>
+                                    </div>
+
+                                    <div class="normal-price-container" style="display: {{ $detail->has_stylist_price ? 'none' : 'block' }};">
+                                        <input type="number" name="details[{{ $index }}][price]" class="form-control mb-2 normal-price-input" 
+                                            placeholder="Harga" value="{{ $detail->price }}" {{ $detail->has_stylist_price ? '' : 'required' }}>
+                                    </div>
+
+                                    <div class="stylist-price-container" style="display: {{ $detail->has_stylist_price ? 'block' : 'none' }};">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <input type="number" name="details[{{ $index }}][price_senior]" class="form-control mb-2 stylist-price-input" 
+                                                    placeholder="Harga Senior" value="{{ $detail->price_senior }}" {{ $detail->has_stylist_price ? 'required' : '' }}>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <input type="number" name="details[{{ $index }}][price_junior]" class="form-control mb-2 stylist-price-input" 
+                                                    placeholder="Harga Junior" value="{{ $detail->price_junior }}" {{ $detail->has_stylist_price ? 'required' : '' }}>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <textarea name="details[{{ $index }}][description]" class="form-control mb-2"
                                         placeholder="Deskripsi">{{ $detail->description }}</textarea>
+
+                                    <button type="button" class="btn btn-danger btn-sm remove-detail mt-2">🗑 Hapus Detail</button>
                                 </div>
                             @endforeach
                         </div>
@@ -133,14 +160,63 @@
 
         let detail_index = {{ $treatment->details->count() }};
         $('#add_detail').click(function () {
-            let html = `<div class="detail_item mb-3">
-                                                                                                                <input type="text" name="details[${detail_index}][name]" class="form-control mb-1" placeholder="Nama Detail" required>
-                                                                                                                <input type="number" name="details[${detail_index}][duration]" class="form-control mb-1" placeholder="Durasi (menit)" required>
-                                                                                                                <input type="number" name="details[${detail_index}][price]" class="form-control mb-1" placeholder="Harga" required>
-                                                                                                                <textarea name="details[${detail_index}][description]" class="form-control" placeholder="Deskripsi"></textarea>
-                                                                                                            </div>`;
+            let html = `<div class="detail_item mb-3 p-3 border rounded">
+                <input type="text" name="details[${detail_index}][name]" class="form-control mb-2" placeholder="Nama Detail" required>
+                <input type="number" name="details[${detail_index}][duration]" class="form-control mb-2" placeholder="Durasi (menit)" required>
+                
+                <div class="form-check mb-2">
+                    <input type="checkbox" class="form-check-input stylist-price-toggle" 
+                        name="details[${detail_index}][has_stylist_price]" value="1" id="has_stylist_price_${detail_index}">
+                    <label class="form-check-label" for="has_stylist_price_${detail_index}">Aktifkan Harga Khusus Stylist (Senior/Junior)</label>
+                </div>
+
+                <div class="normal-price-container">
+                    <input type="number" name="details[${detail_index}][price]" class="form-control mb-2 normal-price-input" placeholder="Harga" required>
+                </div>
+
+                <div class="stylist-price-container" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input type="number" name="details[${detail_index}][price_senior]" class="form-control mb-2 stylist-price-input" placeholder="Harga Senior">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="number" name="details[${detail_index}][price_junior]" class="form-control mb-2 stylist-price-input" placeholder="Harga Junior">
+                        </div>
+                    </div>
+                </div>
+
+                <textarea name="details[${detail_index}][description]" class="form-control mb-2" placeholder="Deskripsi"></textarea>
+                
+                <button type="button" class="btn btn-danger btn-sm remove-detail mt-2">🗑 Hapus Detail</button>
+            </div>`;
             $('#details_wrapper').append(html);
             detail_index++;
+        });
+
+        // Event listener untuk menghapus detail
+        $(document).on('click', '.remove-detail', function() {
+            // Jangan hapus jika hanya tersisa 1 detail
+            if ($('.detail_item').length > 1) {
+                $(this).closest('.detail_item').remove();
+            } else {
+                alert("Minimal harus ada 1 detail treatment.");
+            }
+        });
+
+        // Toggle required attributes when checkbox changes
+        $(document).on('change', '.stylist-price-toggle', function() {
+            let container = $(this).closest('.detail_item');
+            if ($(this).is(':checked')) {
+                container.find('.normal-price-container').hide();
+                container.find('.normal-price-input').removeAttr('required').val('');
+                container.find('.stylist-price-container').show();
+                container.find('.stylist-price-input').prop('required', true);
+            } else {
+                container.find('.normal-price-container').show();
+                container.find('.normal-price-input').prop('required', true);
+                container.find('.stylist-price-container').hide();
+                container.find('.stylist-price-input').removeAttr('required').val('');
+            }
         });
     </script>
 @endsection

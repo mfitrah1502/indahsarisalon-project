@@ -135,8 +135,11 @@ class TreatmentController extends Controller
         $treatment->details()->create([
             'name' => $detail['name'],
             'duration' => $detail['duration'] ?? 0,
-            'price' => $detail['price'],
+            'price' => $detail['price'] ?? 0,
             'description' => $detail['description'] ?? null,
+            'has_stylist_price' => isset($detail['has_stylist_price']) ? 1 : 0,
+            'price_senior' => $detail['price_senior'] ?? null,
+            'price_junior' => $detail['price_junior'] ?? null,
         ]);
 
     }
@@ -197,8 +200,11 @@ class TreatmentController extends Controller
             $treatment->details()->create([
                 'name' => $detail['name'],
                 'duration' => $detail['duration'],
-                'price' => $detail['price'],
+                'price' => $detail['price'] ?? 0,
                 'description' => $detail['description'] ?? null,
+                'has_stylist_price' => isset($detail['has_stylist_price']) ? 1 : 0,
+                'price_senior' => $detail['price_senior'] ?? null,
+                'price_junior' => $detail['price_junior'] ?? null,
             ]);
         }
 
