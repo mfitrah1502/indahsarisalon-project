@@ -74,10 +74,12 @@
                         @foreach($treatments as $treatment)
                             <div class="col-md-4 mb-4">
                                 <div class="card treatment-card h-100 border-0 shadow-sm">
-                                    @if($treatment->image)
-                                        <img src="{{ env('SUPABASE_URL') . '/storage/v1/object/' . env('SUPABASE_BUCKET') . '/' . $treatment->image }}"
-                                            class="card-img-top" alt="{{ $treatment->name }}">
-                                    @endif
+                                    @php
+                                        $imageUrl = $treatment->image 
+                                            ? env('SUPABASE_URL') . '/storage/v1/object/public/' . env('SUPABASE_BUCKET') . '/' . $treatment->image 
+                                            : asset('assets/images/no-image.jpg');
+                                    @endphp
+                                    <img src="{{ $imageUrl }}" class="card-img-top" alt="{{ $treatment->name }}">
                                     <div class="card-body">
                                         <h5 class="card-title">{{ $treatment->name }}</h5>
                                         <p class="card-text">

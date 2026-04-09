@@ -42,6 +42,24 @@
         font-size: 22px;
         cursor: pointer;
     }
+
+    /* Fix pagination icons */
+    .pagination svg {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    .pagination .page-link {
+        padding: 0.5rem 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .pagination {
+        margin-top: 20px;
+        justify-content: center;
+    }
 </style>
 
 @section('content')

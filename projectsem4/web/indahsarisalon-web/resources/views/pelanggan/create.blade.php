@@ -41,6 +41,10 @@
                             <input type="email" name="email" class="form-control" value="{{ old('email') }}" required>
                         </div>
                         <div class="mb-3">
+                            <label>Nomor Telepon</label>
+                            <input type="text" name="phone" class="form-control" value="{{ old('phone') }}" required placeholder="Contoh: 08123456789">
+                        </div>
+                        <div class="mb-3">
                             <label>Password</label>
                             <input type="password" name="password" class="form-control" required>
                         </div>

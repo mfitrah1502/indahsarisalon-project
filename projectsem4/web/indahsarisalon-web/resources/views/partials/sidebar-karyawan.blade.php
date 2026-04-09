@@ -8,7 +8,7 @@
         <div class="navbar-content">
             <ul class="pc-navbar">
                 <li class="pc-item pc-caption">
-                    <label>Home</label>
+                    <label>Dashboard</label>
                     <i class="ti ti-dashboard"></i>
                 </li>
                 <li class="pc-item">
@@ -17,19 +17,22 @@
                 </li>
 
                 <li class="pc-item pc-caption">
-                    <label>Layanan</label>
-                    <i class="ti ti-scissors"></i>
+                    <label>Booking Kasir</label>
+                    <i class="ti ti-apps"></i>
                 </li>
 
-                <li class="pc-item pc-hasmenu {{ request()->is('booking*') ? 'active pc-trigger' : '' }}">
+                <li class="pc-item pc-hasmenu {{ request()->is('booking*') || request()->is('admin/bookings*') ? 'active pc-trigger' : '' }}">
                     <a class="pc-link">
                         <span class="pc-micon"><i class="ti ti-calendar"></i></span>
-                        <span class="pc-mtext">Booking</span>
+                        <span class="pc-mtext">Menu Booking</span>
                         <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                     </a>
                     <ul class="pc-submenu">
                         <li class="pc-item"><a class="pc-link {{ request()->is('booking') ? 'active' : '' }}"
                                 href="{{ route('booking.index') }}">Book An Appointment</a></li>
+
+                        <li class="pc-item"><a class="pc-link {{ request()->is('admin/bookings*') ? 'active' : '' }}"
+                                href="{{ route('karyawan.bookings.index') }}">Status Pemesanan</a></li>
 
                         <li class="pc-item"><a class="pc-link {{ request()->is('booking/history') ? 'active' : '' }}"
                                 href="{{ route('booking.history') }}">Riwayat Pemesanan</a></li>

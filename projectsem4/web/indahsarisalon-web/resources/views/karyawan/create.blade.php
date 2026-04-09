@@ -47,6 +47,10 @@
                             <input type="email" name="email" class="form-control" value="{{ old('email') }}" required>
                         </div>
                         <div class="mb-3">
+                            <label>Nomor Telepon</label>
+                            <input type="text" name="phone" class="form-control" value="{{ old('phone') }}" required placeholder="Contoh: 08123456789">
+                        </div>
+                        <div class="mb-3">
                             <label>Password</label>
                             <input type="password" name="password" class="form-control" required>
                         </div>
@@ -58,13 +62,12 @@
                             </select>
                         </div>
 
-                        <!-- Field kategori (hanya muncul jika role = karyawan) -->
                         <div class="mb-3" id="kategoriDiv" style="display:none;">
                             <label>Kategori</label>
-                            <select name="kategori" class="form-select" required>
+                            <select name="kategori" class="form-select" id="kategoriSelect">
                                 <option value="">-- Pilih Kategori --</option>
-                                <option value="stylist" {{ old('kategori', $karyawan->kategori ?? '') == 'stylist' ? 'selected' : '' }}>Stylist</option>
-                                <option value="biasa" {{ old('kategori', $karyawan->kategori ?? '') == 'biasa' ? 'selected' : '' }}>Biasa</option>
+                                <option value="senior" {{ old('kategori') == 'senior' ? 'selected' : '' }}>Senior</option>
+                                <option value="junior" {{ old('kategori') == 'junior' ? 'selected' : '' }}>Junior</option>
                             </select>
                         </div>
                         <div class="mb-3">

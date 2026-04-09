@@ -40,15 +40,17 @@ class KaryawanController extends Controller
         'name' => 'required|string|max:255',
         'username' => 'required|string|unique:users',
         'email' => 'required|email|unique:users',
+        'phone' => 'required|string|max:15',
         'password' => 'required|string|min:6',
         'role' => 'required|in:admin,karyawan', 
-        'kategori' => 'required_if:role,karyawan|in:,biasa',
+        'kategori' => 'required_if:role,karyawan|in:senior,junior',
     ]);
 
     User::create([
         'name' => $request->name,
         'username' => $request->username,
         'email' => $request->email,
+        'phone' => $request->phone,
         'password' => Hash::make($request->password),
         'role' => $request->role,       // simpan role dari form
         'type' => 'karyawan',
@@ -70,6 +72,7 @@ class KaryawanController extends Controller
         'name' => 'required|string|max:255',
         'username' => 'required|string|unique:users,username,'.$karyawan->id,
         'email' => 'required|email|unique:users,email,'.$karyawan->id,
+        'phone' => 'required|string|max:15',
         'role' => 'required|in:admin,karyawan', // validasi role
         'kategori' => 'required_if:role,karyawan|in:senior,junior',
     ]);
@@ -78,6 +81,7 @@ class KaryawanController extends Controller
         'name' => $request->name,
         'username' => $request->username,
         'email' => $request->email,
+        'phone' => $request->phone,
         'role' => $request->role,   
         'kategori' => $request->role === 'karyawan' ? $request->kategori : null,
         'type' => 'karyawan',    // update role

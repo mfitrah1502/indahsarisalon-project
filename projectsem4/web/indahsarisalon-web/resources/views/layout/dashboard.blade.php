@@ -13,7 +13,13 @@
 
 <body>
     <!-- Sidebar -->
-    @include('partials.sidebar')
+    @if(Auth::user()->role === 'admin')
+        @include('partials.sidebar')
+    @elseif(Auth::user()->role === 'karyawan')
+        @include('partials.sidebar-karyawan')
+    @else
+        @include('partials.sidebar-pelanggan')
+    @endif
 
     <!-- Header -->
     @include('partials.header')
@@ -56,6 +62,7 @@
         }
 
     </script>
+    @stack('scripts')
 </body>
 
 </html>

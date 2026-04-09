@@ -1,133 +1,170 @@
-@extends('layout.dashboard-user')
-@section('title', 'Dashboard')
+@extends('layout.dashboard')
+@section('title', 'Dashboard Pelanggan')
 
 <!-- [Favicon] icon -->
 <link rel="icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/x-icon" />
-
 <!-- [Google Font] Family -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
     id="main-font-link" />
-
-<!-- [Phosphor, Tabler, Feather, Font Awesome, Material] -->
+<!-- [phosphor Icons] https://phosphoricons.com/ -->
 <link rel="stylesheet" href="{{ asset('assets/fonts/phosphor/duotone/style.css') }}" />
+<!-- [Tabler Icons] https://tablericons.com -->
 <link rel="stylesheet" href="{{ asset('assets/fonts/tabler-icons.min.css') }}" />
+<!-- [Feather Icons] https://feathericons.com -->
 <link rel="stylesheet" href="{{ asset('assets/fonts/feather.css') }}" />
+<!-- [Font Awesome Icons] https://fontawesome.com/icons -->
 <link rel="stylesheet" href="{{ asset('assets/fonts/fontawesome.css') }}" />
+<!-- [Material Icons] https://fonts.google.com/icons -->
 <link rel="stylesheet" href="{{ asset('assets/fonts/material.css') }}" />
-
 <!-- [Template CSS Files] -->
 <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" id="main-style-link" />
 <link rel="stylesheet" href="{{ asset('assets/css/style-preset.css') }}" />
 
 @section('content')
-    <div class="pc-container">
-        <div class="pc-content" id="main-content">
-
-            <!-- ===== Recent Booking & Promo ===== -->
-            <div class="row mt-4">
-
-                <!-- Booking Terbaru -->
-                <div class="col-xl-12 col-md-12 mb-3 px-0">
-                    <div class="card h-100">
-                        <div class="card-header">
-                            <h5>Booking Terbaru</h5>
-                        </div>
-                        <div class="card-body">
-                            @php
-                                $bookings = [
-                                    ['service' => 'Haircut', 'date' => '2026-03-05'],
-                                    ['service' => 'Facial', 'date' => '2026-03-07'],
-                                    ['service' => 'Spa', 'date' => '2026-03-10'],
-                                    ['service' => 'Creambath', 'date' => '2026-03-12'],
-                                    ['service' => 'Manicure', 'date' => '2026-03-15'],
-                                ];
-                            @endphp
-
-                            <div class="booking-scroll d-flex overflow-auto gap-3">
-                                @foreach($bookings as $b)
-                                    <div class="card text-white bg-primary p-3"
-                                        style="min-width: 280px; cursor: pointer; transition: transform 0.2s;">
-                                        <h6>{{ $b['service'] }}</h6>
-                                        <p class="mb-0 text-sm">{{ $b['date'] }}</p>
-                                        <p class="mt-2 mb-0 text-sm">Klik untuk booking ulang</p>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
+<div class="row g-4">
+    <!-- WELCOME HERO -->
+    <div class="col-12">
+        <div class="card border-0 shadow-sm overflow-hidden" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="card-body p-4 p-md-5 position-relative">
+                <div class="row align-items-center">
+                    <div class="col-md-7 text-white">
+                        <h2 class="text-white fw-bold mb-2">Halo, {{ Auth::user()->name }}! ✨</h2>
+                        <p class="opacity-75 mb-4">Selamat datang kembali di Indah Sari Salon. Siap untuk tampil lebih menawan hari ini?</p>
+                        <a href="{{ route('booking.index') }}" class="btn btn-light text-primary fw-bold px-4 py-2">
+                            <i class="ti ti-calendar-plus me-2"></i>Buat Janji Temu
+                        </a>
+                    </div>
+                    <div class="col-md-5 text-end d-none d-md-block">
+                        <img src="{{ asset('assets/images/user/avatar-1.jpg') }}" alt="User Profile" class="rounded-circle border border-white border-4 shadow" style="width: 120px; height: 120px; object-fit: cover;">
                     </div>
                 </div>
-
-                <!-- Promo Aktif di bawah Booking -->
-                <div class="col-xl-12 col-md-12 mb-3 px-0">
-                    <div class="card h-100">
-                        <div class="card-header">
-                            <h5>Promo Aktif</h5>
-                        </div>
-                        <div class="card-body">
-                            @php
-                                $promos = [
-                                    ['title' => 'Diskon Facial 20%', 'valid_until' => '2026-03-15'],
-                                    ['title' => 'Buy 1 Get 1 Creambath', 'valid_until' => '2026-03-12'],
-                                ];
-                            @endphp
-                            @if(count($promos) > 0)
-                                <ul class="list-group">
-                                    @foreach($promos as $promo)
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            {{ $promo['title'] }}
-                                            <span class="badge bg-primary rounded-pill">Sampai: {{ $promo['valid_until'] }}</span>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @else
-                                <p>Tidak ada promo aktif saat ini.</p>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-
             </div>
-            <!-- ===== End Recent Booking & Promo ===== -->
-
         </div>
     </div>
 
-    <!-- ===== Custom Style Booking Scroll & Card ===== -->
-    <style>
-        .px-1 {
-            padding-left: 4px !important;
-            padding-right: 4px !important;
-        }
+    <!-- LATEST BOOKING STATUS -->
+    @if($latestBooking)
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 text-dark"><i class="ti ti-bell-ringing me-2 text-warning"></i>Status Booking Terakhir</h5>
+                <a href="{{ route('booking.history') }}" class="btn btn-link btn-sm p-0">Lihat Riwayat <i class="ti ti-chevron-right"></i></a>
+            </div>
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="d-flex align-items-center mb-3 mb-md-0">
+                            <div class="avtar avtar-lg bg-light-primary text-primary me-3">
+                                <i class="ti ti-scissors"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-bold text-dark">{{ $latestBooking->treatment->name }}</h6>
+                                <div class="d-flex flex-wrap gap-2 mb-1">
+                                    <span class="badge bg-light-warning text-dark small"><i class="ti ti-calendar me-1"></i>{{ \Carbon\Carbon::parse($latestBooking->reservation_datetime)->format('d M Y') }}</span>
+                                    <span class="badge bg-light-info text-info small"><i class="ti ti-clock me-1"></i>{{ \Carbon\Carbon::parse($latestBooking->reservation_datetime)->format('H:i') }}</span>
+                                </div>
+                                <small class="text-muted"><i class="ti ti-user-check me-1"></i>Stylist: {{ $latestBooking->stylist->name ?? 'Belum Ditentukan' }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <div class="mb-2">
+                            @if($latestBooking->status === 'proses')
+                                <span class="badge bg-danger rounded-pill px-3 py-2">Sedang Diproses (Pending)</span>
+                            @elseif($latestBooking->status === 'berhasil')
+                                <span class="badge bg-success rounded-pill px-3 py-2">Selesai ✅</span>
+                            @else
+                                <span class="badge bg-secondary rounded-pill px-3 py-2">{{ ucfirst($latestBooking->status) }}</span>
+                            @endif
+                        </div>
+                        <small class="text-muted d-block">Simpan kode booking: <strong>#BOOK-{{ $latestBooking->id }}</strong></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 
-        .booking-scroll {
-            padding-bottom: 10px;
-            scroll-behavior: smooth;
-        }
+    <!-- TREATMENT CATALOG GRID -->
+    <div class="col-12 mt-2">
+        <div class="d-flex justify-content-between align-items-end mb-3">
+            <div>
+                <h4 class="mb-1 fw-bold text-dark">Layanan Unggulan Kami</h4>
+                <p class="text-muted small mb-0">Pilih treatment terbaik untuk perawatan Anda</p>
+            </div>
+            <a href="{{ route('booking.index') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">Lihat Semua</a>
+        </div>
+        
+        <div class="row g-3">
+            @php $count = 0; @endphp
+            @foreach($categories as $category)
+                @foreach($category->treatments as $treatment)
+                    @if($count < 6)
+                    <div class="col-xl-4 col-md-6 col-sm-12">
+                        <div class="card treatment-card border-0 shadow-sm h-100 overflow-hidden">
+                            <div class="position-relative">
+                                @php
+                                    $imageUrl = $treatment->image 
+                                        ? env('SUPABASE_URL') . '/storage/v1/object/public/' . env('SUPABASE_BUCKET') . '/' . $treatment->image 
+                                        : asset('assets/images/no-image.jpg');
+                                @endphp
+                                <img src="{{ $imageUrl }}" class="card-img-top" alt="{{ $treatment->name }}" style="height: 200px; object-fit: cover;">
+                                <div class="position-absolute top-0 start-0 m-3">
+                                    <span class="badge bg-blur text-white px-3 py-2 rounded-pill shadow-sm" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(8px);">
+                                        {{ $category->name }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-bold text-dark mb-1">{{ $treatment->name }}</h5>
+                                <p class="text-muted small mb-3 text-truncate-2" style="height: 40px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                                    Nikmati layanan {{ $treatment->name }} profesional dari stylist berpengalaman kami.
+                                </p>
+                                <div class="mt-auto d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <small class="text-muted d-block">Mulai dari</small>
+                                        <span class="fw-bold text-primary h5 mb-0">Rp {{ number_format($treatment->details->min('price') ?? 0, 0, ',', '.') }}</span>
+                                    </div>
+                                    <a href="{{ route('booking.select', $treatment->id) }}" class="btn btn-primary rounded-pill px-3">
+                                        Booking
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @php $count++; @endphp
+                    @endif
+                @endforeach
+            @endforeach
+        </div>
+    </div>
+</div>
 
-        .booking-scroll::-webkit-scrollbar {
-            height: 6px;
-        }
+<style>
+    .treatment-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .treatment-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .bg-blur {
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+</style>
+@endsection
 
-        .booking-scroll::-webkit-scrollbar-thumb {
-            background-color: rgba(0, 0, 0, 0.2);
-            border-radius: 3px;
-        }
-
-        .booking-scroll .card:hover {
-            transform: scale(1.05);
-        }
-
-        .booking-card {
-            min-height: 400px;
-            max-height: 400px;
-        }
-    </style>
-
-    <!-- ===== JS Dependencies ===== -->
+@push('scripts')
     <script src="{{ asset('assets/js/plugins/popper.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/simplebar.min.js') }}"></script>
-    <script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('assets/js/icon/custom-font.js') }}"></script>
+    <script src="{{ asset('assets/js/plugins/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('assets/js/fonts/custom-font.js') }}"></script>
     <script src="{{ asset('assets/js/script.js') }}"></script>
     <script src="{{ asset('assets/js/theme.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/feather.min.js') }}"></script>
@@ -139,30 +176,5 @@
         layout_caption_change('true');
         layout_rtl_change('false');
         preset_change('preset-1');
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const toggleBtn = document.querySelector('#sidebar-toggle-btn'); // tombol sidebar
-            const container = document.querySelector('.pc-container');
-
-            // toggle sidebar class
-            toggleBtn.addEventListener('click', () => {
-                container.classList.toggle('sidebar-open');
-            });
-
-            // AJAX page load
-            document.querySelectorAll(".pc-link").forEach(link => {
-                link.addEventListener("click", function (e) {
-                    let url = this.getAttribute("href");
-                    if (!url || url === "#" || url.startsWith("http")) return;
-                    e.preventDefault();
-                    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                        .then(res => res.text())
-                        .then(data => {
-                            document.querySelector("#main-content").innerHTML = data;
-                            window.history.pushState({}, "", url);
-                        });
-                });
-            });
-        });
     </script>
-@endsection
+@endpush

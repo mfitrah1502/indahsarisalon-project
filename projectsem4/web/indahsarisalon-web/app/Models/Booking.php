@@ -12,7 +12,7 @@ class Booking extends Model
     protected $fillable = [
         'user_id', 'customer_name', 'cashier_id', 'stylist_id', 'treatment_id', 
         'reservation_datetime', 'total_price', 
-        'status', 'payment_status'
+        'status', 'payment_status', 'payment_method', 'snap_token', 'midtrans_id'
     ];
 
     public function user()
