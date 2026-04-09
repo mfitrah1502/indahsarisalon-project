@@ -115,6 +115,14 @@
 
                         <form id="bookingForm">
                             <div class="row">
+                                {{-- Jika login sebagai Admin atau Karyawan, tampilkan input Nama Pelanggan --}}
+                                @if(in_array(Auth::user()->role, ['admin', 'karyawan']))
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label fw-bold">👤 Nama Pelanggan (Offline)</label>
+                                        <input type="text" name="customer_name_input" id="customer_name_input" class="form-control" placeholder="Masukkan nama pelanggan..." required>
+                                        <small class="text-muted">Gunakan ini jika pelanggan tidak memiliki akun/HP.</small>
+                                    </div>
+                                @endif
 
                                 @php
                                     $hasStylistPrice = $treatment->details->contains('has_stylist_price', true);
@@ -171,7 +179,7 @@
 
                             <p><strong>Treatment:</strong> {{ $treatment->name }}</p>
 
-                            <p><strong>Customer:</strong> {{ Auth::user()->name }}</p>
+                            <p><strong>Customer:</strong> <span id="summaryCustomer">{{ Auth::user()->name }}</span></p>
 
                             <p><strong>Detail:</strong><br>
                                 @foreach($treatment->details as $detail)
@@ -198,7 +206,7 @@
                                 @csrf
 
                                 <input type="hidden" name="treatment_id" value="{{ $treatment->id }}">
-                                <input type="hidden" name="customer_name" value="{{ Auth::user()->name }}">
+                                <input type="hidden" name="customer_name" id="paymentCustomerName" value="{{ Auth::user()->name }}">
                                 <input type="hidden" name="stylist_id" id="paymentStylist">
                                 <input type="hidden" name="reservation_date" id="paymentDate">
                                 <input type="hidden" name="reservation_time" id="paymentTime">
@@ -249,8 +257,8 @@
                     <div class="mb-3">
                         <i class="ti ti-loader text-primary" style="font-size: 3rem;"></i>
                     </div>
-                    <h4>Booking sedang di proses</h4>
-                    <p class="text-muted">Terima kasih telah melakukan booking. Silakan klik tombol di bawah untuk kembali.</p>
+                    <h4 id="modalStatusTitle">Booking sedang diproses</h4>
+                    <p id="modalStatusDesc" class="text-muted">Terima kasih telah melakukan booking. Silakan klik tombol di bawah untuk kembali.</p>
                     <a href="{{ route('dashboard') }}" class="btn btn-primary px-4">Kembali ke Dashboard</a>
                 </div>
             </div>
@@ -324,6 +332,13 @@
                     document.getElementById('summaryStylist').innerText = stylistNameText;
                     document.getElementById('summaryDatetime').innerText = d.value + ' ' + time.value;
 
+                    // Update Nama Pelanggan jika Karyawan
+                    const customName = document.getElementById('customer_name_input');
+                    if(customName && customName.value) {
+                        document.getElementById('summaryCustomer').innerText = customName.value;
+                        document.getElementById('paymentCustomerName').value = customName.value;
+                    }
+
                     // isi hidden form payment
                     document.getElementById('paymentStylist').value = s ? s.value : '';
                     document.getElementById('paymentDate').value = d.value;
@@ -349,22 +364,23 @@
                     if (response.payment_method === 'transfer' && response.snap_token) {
                         // Triger Midtrans Snap
                         snap.pay(response.snap_token, {
-                            onSuccess: function(result) {
-                                $('#modalProses').modal('show');
-                            },
-                            onPending: function(result) {
-                                $('#modalProses').modal('show');
-                            },
-                            onError: function(result) {
-                                console.error(result);
-                                $('#modalProses').modal('show');
-                            },
-                            onClose: function() {
-                                $('#modalProses').modal('show');
-                            }
+                            onSuccess: function(result) { $('#modalProses').modal('show'); },
+                            onPending: function(result) { $('#modalProses').modal('show'); },
+                            onError: function(result) { $('#modalProses').modal('show'); },
+                            onClose: function() { $('#modalProses').modal('show'); }
                         });
                     } else {
-                        // Cash payment
+                        // Cash payment logic
+                        if (response.payment_method === 'cash') {
+                            const isStaff = {{ in_array(Auth::user()->role, ['admin', 'karyawan']) ? 'true' : 'false' }};
+                            if (isStaff) {
+                                $('#modalStatusTitle').text('Pembayaran Berhasil! ✅');
+                                $('#modalStatusDesc').text('Booking telah berhasil dicatat dan status pembayaran ditandai sebagai LUNAS.');
+                            } else {
+                                $('#modalStatusTitle').text('Booking Berhasil! 📅');
+                                $('#modalStatusDesc').text('Booking Anda telah masuk ke sistem. Silakan lakukan pembayaran di lokasi (Cash).');
+                            }
+                        }
                         $('#modalProses').modal('show');
                     }
                 },

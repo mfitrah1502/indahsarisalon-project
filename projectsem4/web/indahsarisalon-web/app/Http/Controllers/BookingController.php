@@ -84,16 +84,19 @@ class BookingController extends Controller
             $total_price += $price;
         }
 
+        $isStaff = in_array(Auth::user()->role, ['admin', 'karyawan']);
+        $paymentStatus = ($isStaff && $request->payment_method === 'cash') ? 'paid' : 'unpaid';
+
         $booking = Booking::create([
-            'user_id' => Auth::id(),
+            'user_id' => $isStaff ? null : Auth::id(),
             'customer_name' => $request->customer_name,
-            'cashier_id' => Auth::id(),
+            'cashier_id' => $isStaff ? Auth::id() : null,
             'stylist_id' => $request->stylist_id,
             'treatment_id' => $request->treatment_id,
             'reservation_datetime' => Carbon::parse($request->reservation_date.' '.$request->reservation_time),
             'total_price' => $total_price,
             'status' => 'proses',
-            'payment_status' => 'unpaid',
+            'payment_status' => $paymentStatus,
             'payment_method' => $request->payment_method
         ]);
 
@@ -172,12 +175,44 @@ class BookingController extends Controller
     // Riwayat booking
     public function history()
     {
-        $bookings = Booking::with(['treatment','stylist'])
-                    ->where('user_id', Auth::id())
-                    ->orderBy('reservation_datetime','desc')
-                    ->get();
+        $user = Auth::user();
+        $query = Booking::with(['treatment', 'stylist', 'cashier']);
 
-        return view('booking.history', compact('bookings'));
+        if ($user->role === 'pelanggan') {
+            $query->where('user_id', $user->id);
+        } elseif ($user->role === 'karyawan') {
+            $query->where(function ($q) use ($user) {
+                $q->where('cashier_id', $user->id)
+                    ->orWhere('stylist_id', $user->id);
+            });
+        }
+
+        $allBookings = $query->orderBy('reservation_datetime', 'desc')->get();
+
+        // Bagi data untuk Pelanggan (Proses vs Riwayat)
+        $inProcess = $allBookings->whereIn('status', ['proses', 'pending']);
+        $history = $allBookings->whereIn('status', ['berhasil', 'dibatalkan']);
+
+        return view('booking.history', compact('inProcess', 'history', 'allBookings'));
+    }
+
+    // Batalkan booking (Pelanggan)
+    public function cancel(Request $request, $id)
+    {
+        $booking = Booking::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        if ($booking->status !== 'proses' && $booking->status !== 'pending') {
+            return response()->json(['success' => false, 'message' => 'Pemesanan ini tidak dapat dibatalkan.'], 400);
+        }
+
+        $booking->update([
+            'status' => 'dibatalkan',
+            'cancel_reason' => $request->reason ?? 'Dibatalkan oleh pelanggan'
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Booking berhasil dibatalkan.']);
     }
 
     // Midtrans Webhook
@@ -221,10 +256,24 @@ class BookingController extends Controller
     {
         $status = $request->get('status', 'proses'); // Default to proses
 
-        $query = Booking::with(['user', 'stylist', 'treatment']);
+        $query = Booking::with(['user', 'stylist', 'treatment', 'cashier']);
 
         if ($status !== 'all') {
             $query->where('status', $status);
+        }
+
+        // Filter Tanggal (Harian, Bulanan, Tahunan)
+        $filter_mode = $request->get('filter_mode');
+        $filter_value = $request->get('filter_value');
+
+        if ($filter_mode && $filter_value) {
+            if ($filter_mode === 'daily') {
+                $query->whereDate('reservation_datetime', $filter_value);
+            } elseif ($filter_mode === 'monthly') {
+                $query->whereRaw("TO_CHAR(reservation_datetime, 'YYYY-MM') = ?", [$filter_value]);
+            } elseif ($filter_mode === 'yearly') {
+                $query->whereRaw("TO_CHAR(reservation_datetime, 'YYYY') = ?", [$filter_value]);
+            }
         }
 
         $bookings = $query->orderBy('created_at', 'desc')->paginate(10);
@@ -237,7 +286,10 @@ class BookingController extends Controller
             'dibatalkan' => Booking::where('status', 'dibatalkan')->count(),
         ];
 
-        return view('admin.bookings.index', compact('bookings', 'stats', 'status'));
+        // Tentukan view berdasarkan role
+        $view = (Auth::user()->role === 'karyawan') ? 'karyawan.bookings.index' : 'admin.bookings.index';
+
+        return view($view, compact('bookings', 'status', 'stats'));
     }
 
     // ADMIN: Update status booking

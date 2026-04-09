@@ -1,6 +1,6 @@
 @extends('layout.dashboard')
 
-@section('title', 'Manajemen Booking')
+@section('title', 'Status Pemesanan | Staf')
 <link rel="icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/x-icon" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
     id="main-font-link" />
@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="{{ asset('assets/css/style-preset.css') }}" />
 <style>
     .table > :not(caption) > * > * {
-        padding: 1.25rem 1rem; /* Biar tabel lebih besar/luas */
+        padding: 1.25rem 1rem;
     }
     .badge {
         font-size: 0.85rem;
@@ -41,7 +41,7 @@
                         <i class="ti ti-calendar-event fs-3"></i>
                     </div>
                     <div class="flex-grow-1 ms-3">
-                        <h6 class="text-white mb-0 opacity-75">Total Booking</h6>
+                        <h6 class="text-white mb-0 opacity-75">Semua Pesanan</h6>
                         <h4 class="text-white mb-0">{{ $stats['total'] }}</h4>
                     </div>
                 </div>
@@ -56,7 +56,7 @@
                         <i class="ti ti-loader fs-3"></i>
                     </div>
                     <div class="flex-grow-1 ms-3">
-                        <h6 class="text-dark mb-0 opacity-75">Pending / Proses</h6>
+                        <h6 class="text-dark mb-0 opacity-75">Perlu Diproses</h6>
                         <h4 class="text-dark mb-0">{{ $stats['proses'] }}</h4>
                     </div>
                 </div>
@@ -71,7 +71,7 @@
                         <i class="ti ti-check fs-3"></i>
                     </div>
                     <div class="flex-grow-1 ms-3">
-                        <h6 class="text-white mb-0 opacity-75">Selesai / Berhasil</h6>
+                        <h6 class="text-white mb-0 opacity-75">Sudah Selesai</h6>
                         <h4 class="text-white mb-0">{{ $stats['berhasil'] }}</h4>
                     </div>
                 </div>
@@ -100,7 +100,7 @@
         <div class="card shadow-sm border-0">
             <div class="card-header bg-white border-bottom pt-3 pb-0">
                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-                    <h4 class="mb-0">📋 Manajemen Status Pemesanan</h4>
+                    <h4 class="mb-0">📋 Panel Operasional Booking</h4>
                     
                     <!-- DATE FILTER SECTION -->
                     <form action="{{ route('admin.bookings.index') }}" method="GET" id="filterForm" class="row g-2 align-items-center">
@@ -168,12 +168,12 @@
                         <thead class="table-light">
                             <tr>
                                 <th>No</th>
-                                <th>Log Booking</th>
-                                <th>Detail Treatment</th>
-                                <th>Waktu & Stylist</th>
-                                <th>Total & Metode</th>
-                                <th>Payment Status</th>
-                                <th class="text-center">Aksi</th>
+                                <th>Informasi Pelanggan</th>
+                                <th>Layanan</th>
+                                <th>Waktu & Petugas</th>
+                                <th>Biaya & Bayar</th>
+                                <th>Status Bayar</th>
+                                <th class="text-center">Aksi Staf</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -186,10 +186,10 @@
                                             @if($booking->user)
                                                 <small class="text-muted"><i class="ti ti-mail me-1"></i>{{ $booking->user->email }}</small>
                                             @else
-                                                <small class="text-muted text-uppercase" style="font-size: 0.7rem;"><i class="ti ti-user me-1"></i>Pelanggan Offline</small>
+                                                <small class="text-muted text-uppercase" style="font-size: 0.7rem;"><i class="ti ti-user me-1"></i>OFFLINE CUSTOMER</small>
                                             @endif
                                             @if($booking->cashier)
-                                                <small class="text-success"><i class="ti ti-id me-1"></i>Petugas: {{ $booking->cashier->name }}</small>
+                                                <small class="text-success"><i class="ti ti-id me-1"></i>Oleh: {{ $booking->cashier->name }}</small>
                                             @endif
                                             <small class="text-info">#BOOK-{{ $booking->id }}</small>
                                         </div>
@@ -197,13 +197,13 @@
                                     <td>
                                         <div class="d-flex flex-column">
                                             <span class="text-primary fw-bold">{{ $booking->treatment->name }}</span>
-                                            <small class="text-muted">Total {{ $booking->details->count() }} sub-layanan</small>
+                                            <small class="text-muted">{{ $booking->details->count() }} Detail</small>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="d-flex flex-column">
                                             <span><i class="ti ti-clock me-1 text-warning"></i>{{ \Carbon\Carbon::parse($booking->reservation_datetime)->format('d M Y, H:i') }}</span>
-                                            <small class="text-muted"><i class="ti ti-user me-1 text-secondary"></i>{{ $booking->stylist->name ?? 'Tanpa Stylist' }}</small>
+                                            <small class="text-muted"><i class="ti ti-user me-1 text-secondary"></i>Stylist: {{ $booking->stylist->name ?? 'None' }}</small>
                                         </div>
                                     </td>
                                     <td>
@@ -229,17 +229,17 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="dropdown">
-                                            <button class="btn btn-sm btn-light border dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                Ubah Status
+                                            <button class="btn btn-sm btn-primary border dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                Update Status
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                                                <li class="dropdown-header">Update Progres Booking</li>
+                                                <li class="dropdown-header">Ubah Status Pengerjaan</li>
                                                 <li>
                                                     <form action="{{ route('admin.bookings.updateStatus', $booking->id) }}" method="POST">
                                                         @csrf
                                                         @method('PATCH')
                                                         <input type="hidden" name="status" value="proses">
-                                                        <button type="submit" class="dropdown-item">⏳ Set Ke Proses</button>
+                                                        <button type="submit" class="dropdown-item">⏳ Sedang Proses</button>
                                                     </form>
                                                 </li>
                                                 <li>
@@ -247,7 +247,7 @@
                                                         @csrf
                                                         @method('PATCH')
                                                         <input type="hidden" name="status" value="berhasil">
-                                                        <button type="submit" class="dropdown-item text-success">✅ Selesai (Berhasil)</button>
+                                                        <button type="submit" class="dropdown-item text-success">✅ Selesai</button>
                                                     </form>
                                                 </li>
                                                 <li>
@@ -255,7 +255,7 @@
                                                         @csrf
                                                         @method('PATCH')
                                                         <input type="hidden" name="status" value="dibatalkan">
-                                                        <button type="submit" class="dropdown-item text-danger">❌ Batalkan Booking</button>
+                                                        <button type="submit" class="dropdown-item text-danger">❌ Batalkan</button>
                                                     </form>
                                                 </li>
                                             </ul>
@@ -267,7 +267,7 @@
                                     <td colspan="7" class="text-center py-5">
                                         <div class="text-muted">
                                             <i class="ti ti-clipboard-x fs-1 opacity-25"></i>
-                                            <p class="mt-2">Belum ada pemesanan di kategori <b>{{ ucfirst($status) }}</b>.</p>
+                                            <p class="mt-2">Belum ada pemesanan dalam kategori ini.</p>
                                         </div>
                                     </td>
                                 </tr>

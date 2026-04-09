@@ -48,12 +48,13 @@ class PasswordResetController extends Controller
                                 ->first();
 
         if (!$otpData || $otpData->expires_at < Carbon::now()) {
-            return response()->json(['message' => 'OTP tidak valid atau sudah expired'], 400);
+            return redirect()->back()
+                             ->withInput()
+                             ->with('error', 'Kode OTP tidak valid atau sudah kedaluwarsa!');
         }
 
-        // return response()->json(['message' => 'OTP valid, silakan reset password']);
         return redirect()->route('reset.password.form', ['email' => $request->email, 'otp' => $request->otp])
-                         ->with('success', 'OTP valid, silakan reset password');
+                         ->with('success', 'OTP valid! Silakan buat kata sandi baru.');
     }
 
     // 3️⃣ Reset password

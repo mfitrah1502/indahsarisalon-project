@@ -15,8 +15,8 @@ class AbsensiController extends Controller
         /** @var \App\Models\User|null $user */
         $user = Auth::user();
 
-        // cek role kasir langsung di controller
-        if ($user->role !== 'kasir') {
+        // cek role karyawan langsung di controller
+        if (!in_array($user->role, ['admin', 'karyawan'])) {
             abort(403, 'Unauthorized');
         }
 
@@ -36,8 +36,8 @@ class AbsensiController extends Controller
     {
         $user = Auth::user();
 
-        // cek role kasir
-        if ($user->role !== 'kasir') {
+        // cek role
+        if (!in_array($user->role, ['admin', 'karyawan'])) {
             abort(403, 'Unauthorized');
         }
 

@@ -20,6 +20,7 @@
 <!-- [Template CSS Files] -->
 <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" id="main-style-link" />
 <link rel="stylesheet" href="{{ asset('assets/css/style-preset.css') }}" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 @section('content')
     <div class="row">
@@ -75,13 +76,32 @@
         document.getElementById('pay-button')?.onclick = function() {
             snap.pay('{{ $booking->snap_token }}', {
                 onSuccess: function(result) {
-                    window.location.href = "{{ route('booking.history') }}";
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Pembayaran Berhasil!',
+                        text: 'Terima kasih, pembayaran Anda telah kami terima.',
+                        showConfirmButton: false,
+                        timer: 2500
+                    }).then(() => {
+                        window.location.href = "{{ route('booking.history') }}";
+                    });
                 },
                 onPending: function(result) {
-                    window.location.href = "{{ route('booking.history') }}";
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Pembayaran Tertaut!',
+                        text: 'Silakan selesaikan pembayaran sesuai instruksi di Midtrans.',
+                        showConfirmButton: true
+                    }).then(() => {
+                        window.location.href = "{{ route('booking.history') }}";
+                    });
                 },
                 onError: function(result) {
-                    alert("Pembayaran gagal!");
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Pembayaran Gagal',
+                        text: 'Terjadi kesalahan saat memproses pembayaran. Silakan coba lagi.'
+                    });
                 }
             });
         };
