@@ -48,6 +48,7 @@
                                 <th>Nama</th>
                                 <th>Username</th>
                                 <th>Email</th>
+                                <th>Telepon</th>
                                 <th>Role</th>
                                 <th>Status</th>
                                 <th width="150">Aksi</th>
@@ -63,6 +64,7 @@
                                         </a></td>
                                     <td>{{ $karyawan->username }}</td>
                                     <td>{{ $karyawan->email }}</td>
+                                    <td>{{ $karyawan->phone ?? '-' }}</td>
                                     <td>{{ ucfirst($karyawan->role) }}</td>
                                     <td>{{ ucfirst($karyawan->status) }}</td>
 

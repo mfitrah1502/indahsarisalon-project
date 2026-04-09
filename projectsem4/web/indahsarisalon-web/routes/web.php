@@ -55,9 +55,18 @@ Route::post('/reset-password/otp', [PasswordResetController::class, 'resetPasswo
 // Routes yang membutuhkan auth + session timeout
 // ------------------------------
 Route::middleware(['auth', 'session.timeout'])->group(function () {
-    Route::get('/profile', function () {
-    return view('profile.index');
-})->middleware('auth')->name('profile');
+    // ------------------------------
+    // Profile
+    // ------------------------------
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [App\Http\Controllers\ProfileController::class, 'index'])->name('index');
+        Route::post('/update', [App\Http\Controllers\ProfileController::class, 'updateProfile'])->name('update-info');
+        Route::post('/change-password', [App\Http\Controllers\ProfileController::class, 'changePassword'])->name('change-password');
+        Route::post('/avatar-update', [App\Http\Controllers\ProfileController::class, 'updateAvatar'])->name('avatar.update');
+        Route::post('/otp-send', [App\Http\Controllers\ProfileController::class, 'sendOtp'])->name('otp.send');
+        Route::post('/otp-verify', [App\Http\Controllers\ProfileController::class, 'verifyAndReset'])->name('otp.verify');
+    });
+    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'index'])->name('profile');
 
     // ------------------------------
     // Dashboard
@@ -113,6 +122,10 @@ Route::middleware(['auth', 'session.timeout'])->group(function () {
 
         // Pelanggan
         Route::resource('pelanggan', PelangganController::class);
+
+        // Booking Admin Management
+        Route::get('/admin/bookings', [BookingController::class, 'adminIndex'])->name('admin.bookings.index');
+        Route::patch('/admin/bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('admin.bookings.updateStatus');
     });
     
     //Booking
@@ -134,5 +147,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/booking/summary/{bookingId}', [BookingController::class, 'summary'])->name('booking.summary'); // step summary
     Route::post('/booking/pay/{bookingId}', [BookingController::class, 'pay'])->name('booking.pay'); // bayar
     Route::get('/booking/history', [BookingController::class, 'history'])->name('booking.history'); // riwayat
+    Route::post('/booking/notification', [BookingController::class, 'handleNotification'])->name('booking.notification'); // webhook
 });
 });

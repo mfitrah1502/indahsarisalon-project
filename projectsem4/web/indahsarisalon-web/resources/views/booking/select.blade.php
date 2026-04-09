@@ -146,7 +146,6 @@
                                         </select>
                                     </div>
                                 @endif
-
                                 <!-- TANGGAL -->
                                 <div class="col-md-3 mb-3">
                                     <label class="form-label">📅 Tanggal</label>
@@ -172,6 +171,8 @@
 
                             <p><strong>Treatment:</strong> {{ $treatment->name }}</p>
 
+                            <p><strong>Customer:</strong> {{ Auth::user()->name }}</p>
+
                             <p><strong>Detail:</strong><br>
                                 @foreach($treatment->details as $detail)
                                     - {{ $detail->name }} ({{ $detail->duration }} menit) - Rp
@@ -193,10 +194,11 @@
                         <div class="p-3 rounded" style="background:#f8f9fa;">
                             <h5 class="mb-3">💳 Pembayaran</h5>
 
-                            <form method="POST" action="{{ route('booking.store') }}">
+                            <form method="POST" action="{{ route('booking.store') }}" id="finalBookingForm">
                                 @csrf
 
                                 <input type="hidden" name="treatment_id" value="{{ $treatment->id }}">
+                                <input type="hidden" name="customer_name" value="{{ Auth::user()->name }}">
                                 <input type="hidden" name="stylist_id" id="paymentStylist">
                                 <input type="hidden" name="reservation_date" id="paymentDate">
                                 <input type="hidden" name="reservation_time" id="paymentTime">
@@ -238,6 +240,26 @@
     <script src="{{ asset('assets/js/theme.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/feather.min.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- MODAL PROSES -->
+    <div class="modal fade" id="modalProses" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="ti ti-loader text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4>Booking sedang di proses</h4>
+                    <p class="text-muted">Terima kasih telah melakukan booking. Silakan klik tombol di bawah untuk kembali.</p>
+                    <a href="{{ route('dashboard') }}" class="btn btn-primary px-4">Kembali ke Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Midtrans Snap JS -->
+    <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key="{{ config('services.midtrans.client_key') }}"></script>
 
     <script>
         layout_change('light');
@@ -291,6 +313,12 @@
                     const d = document.getElementById('reservation_date');
                     const time = document.getElementById('reservation_time');
 
+                    // Validasi step 1
+                    if(!d.value || !time.value) {
+                        alert('Silakan pilih tanggal dan waktu reservasi.');
+                        return;
+                    }
+
                     // isi ringkasan
                     let stylistNameText = (s && s.selectedIndex > 0) ? s.selectedOptions[0].text : '-';
                     document.getElementById('summaryStylist').innerText = stylistNameText;
@@ -303,6 +331,48 @@
                 }
             currentStep++;
             showStep(currentStep);
+        });
+
+        // AJAX FORM SUBMISSION
+        $('#finalBookingForm').on('submit', function(e) {
+            e.preventDefault();
+            const form = $(this);
+            const submitBtn = form.find('button[type="submit"]');
+            
+            submitBtn.prop('disabled', true).text('⏳ Menyimpan...');
+
+            $.ajax({
+                url: form.attr('action'),
+                method: 'POST',
+                data: form.serialize(),
+                success: function(response) {
+                    if (response.payment_method === 'transfer' && response.snap_token) {
+                        // Triger Midtrans Snap
+                        snap.pay(response.snap_token, {
+                            onSuccess: function(result) {
+                                $('#modalProses').modal('show');
+                            },
+                            onPending: function(result) {
+                                $('#modalProses').modal('show');
+                            },
+                            onError: function(result) {
+                                console.error(result);
+                                $('#modalProses').modal('show');
+                            },
+                            onClose: function() {
+                                $('#modalProses').modal('show');
+                            }
+                        });
+                    } else {
+                        // Cash payment
+                        $('#modalProses').modal('show');
+                    }
+                },
+                error: function(xhr) {
+                    alert('Terjadi kesalahan: ' + (xhr.responseJSON?.message || 'Gagal menyimpan booking'));
+                    submitBtn.prop('disabled', false).text('✅ Bayar & Konfirmasi');
+                }
+            });
         });
 
         // Inisialisasi step pertama
@@ -362,7 +432,7 @@
                 let details = @json($treatment->details);
                 let newPrice = 0;
 
-                details.forEach(function(detail) {
+                details.forEach(function (detail) {
                     if (detail.has_stylist_price && kategori) {
                         if (kategori === 'senior') {
                             newPrice += parseInt(detail.price_senior || 0);

@@ -97,37 +97,44 @@
                 <li class="dropdown pc-h-item header-user-profile">
                     <a class="pc-head-link head-link-primary dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown"
                         href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                        <img src="/assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar" />
+                        <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : '/assets/images/user/avatar-2.jpg' }}" alt="user-image" class="user-avtar" />
                         <span>
                             <i class="ti ti-settings"></i>
                         </span>
                     </a>
                     <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
                         <div class="dropdown-header">
+                            @php
+                                $hour = date('H');
+                                if ($hour >= 5 && $hour < 11) {
+                                    $greeting = 'Selamat Pagi';
+                                } elseif ($hour >= 11 && $hour < 15) {
+                                    $greeting = 'Selamat Siang';
+                                } elseif ($hour >= 15 && $hour < 18) {
+                                    $greeting = 'Selamat Sore';
+                                } else {
+                                    $greeting = 'Selamat Malam';
+                                }
+                            @endphp
                             <h4>
-                                Good Morning,
-                                <span class="small text-muted">John Doe</span>
+                                {{ $greeting }},
+                                <span class="small text-muted">{{ Auth::user()->name }}</span>
                             </h4>
-                            <p class="text-muted">Project Admin</p>
+                            <p class="text-muted">{{ ucfirst(Auth::user()->role ?? 'User') }}</p>
                             <hr />
                             <div class="profile-notification-scroll position-relative"
                                 style="max-height: calc(100vh - 280px)">
                                 <div class="upgradeplan-block bg-light-warning rounded">
-                                    <h4>Explore full code</h4>
-                                    <p class="text-muted">Buy now to get full access of code files</p>
-                                    <a href="https://codedthemes.com/item/berry-bootstrap-5-admin-template/"
-                                        target="_blank" class="btn btn-warning">Buy Now</a>
+                                    <h4>Layanan Salon Premium</h4>
+                                    <p class="text-muted">Nikmati perawatan terbaik dari para ahli kami.</p>
+                                    <a href="{{ route('booking.index') }}" class="btn btn-warning">Pesan Sekarang</a>
                                 </div>
                                 <hr />
-                                <a href="../application/account-profile-v1.html" class="dropdown-item">
-                                    <i class="ti ti-settings"></i>
-                                    <span>Account Settings</span>
-                                </a>
-                                <a href="../application/social-profile.html" class="dropdown-item">
+                                <a href="{{ route('profile') }}" class="dropdown-item">
                                     <i class="ti ti-user"></i>
-                                    <span>Social Profile</span>
+                                    <span>My Profile</span>
                                 </a>
-                                <a href="../pages/login-v1.html" class="dropdown-item">
+                                <a href="{{ route('auth') }}" class="dropdown-item">
                                     <i class="ti ti-logout"></i>
                                     <span>Logout</span>
                                 </a>

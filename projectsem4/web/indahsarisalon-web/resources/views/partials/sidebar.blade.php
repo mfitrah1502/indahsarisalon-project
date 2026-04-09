@@ -53,8 +53,15 @@
                     <ul class="pc-submenu">
                         <li class="pc-item"><a class="pc-link {{ request()->is('booking') ? 'active' : '' }}"
                                 href="{{ route('booking.index') }}">Book An Appointment</a></li>
-                        <li class="pc-item"><a class="pc-link {{ request()->is('booking/select*') ? 'active' : '' }}"
-                                href="{{ route('booking.select', ['treatmentId' => 1]) }}">Status Pemesanan</a></li>
+                        
+                        @if(Auth::user()->role === 'admin')
+                            <li class="pc-item"><a class="pc-link {{ request()->is('admin/bookings*') ? 'active' : '' }}"
+                                    href="{{ route('admin.bookings.index') }}">Status Pemesanan</a></li>
+                        @else
+                            <li class="pc-item"><a class="pc-link {{ request()->is('booking/select*') ? 'active' : '' }}"
+                                    href="{{ route('booking.select', ['treatmentId' => 1]) }}">Status Pemesanan</a></li>
+                        @endif
+
                         <li class="pc-item"><a class="pc-link {{ request()->is('booking/history') ? 'active' : '' }}"
                                 href="{{ route('booking.history') }}">Riwayat Pemesanan</a></li>
                     </ul>
@@ -70,16 +77,6 @@
                 <li class="pc-item pc-caption">
                     <label>Other</label>
                     <i class="ti ti-brand-chrome"></i>
-                </li>
-                <li class="pc-item"><a class="pc-link" href="{{ route('about') }}">
-                        <span class="pc-micon"><i class="ti ti-info-circle"></i></span>
-                        <span class="pc-mtext">About Us</span>
-                    </a>
-                </li>
-                <li class="pc-item"><a class="pc-link" href="#!">
-                        <span class="pc-micon"><i class="ti ti-star"></i></span>
-                        <span class="pc-mtext">Rating</span>
-                    </a>
                 </li>
 
                 <li class="pc-item pc-caption">

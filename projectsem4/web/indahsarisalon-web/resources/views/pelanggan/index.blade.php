@@ -69,8 +69,8 @@
                             <tr>
                                 <th>No</th>
                                 <th>Nama</th>
-                                <th>Username</th>
                                 <th>Email</th>
+                                <th>Telepon</th>
                                 <th>Status</th>
                                 <th width="150">Aksi</th>
                             </tr>
@@ -79,11 +79,12 @@
                             @forelse($pelanggans as $index => $pelanggan)
                                 <tr class="pelanggan-row" data-name="{{ $pelanggan->name }}"
                                     data-username="{{ $pelanggan->username }}" data-email="{{ $pelanggan->email }}"
+                                    data-phone="{{ $pelanggan->phone }}"
                                     data-status="{{ $pelanggan->status }}">
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $pelanggan->name }}</td>
-                                    <td>{{ $pelanggan->username }}</td>
                                     <td>{{ $pelanggan->email }}</td>
+                                    <td>{{ $pelanggan->phone ?? '-' }}</td>
                                     <td>{{ ucfirst($pelanggan->status) }}</td>
                                     <td>
                                         <button class="btn btn-sm btn-info view-detail">Lihat</button>
@@ -117,6 +118,7 @@
             <h4 id="popupName"></h4>
             <p><b>Username:</b> <span id="popupUsername"></span></p>
             <p><b>Email:</b> <span id="popupEmail"></span></p>
+            <p><b>Telepon:</b> <span id="popupPhone"></span></p>
             <p><b>Status:</b> <span id="popupStatus"></span></p>
         </div>
     </div>
@@ -145,10 +147,13 @@
                 url: " {{ route('pelanggan.index') }}", type: "GET", data: { search: query }, success: function (data) { let tbody = $(data).find('tbody').html(); $('tbody').html(tbody); }
             });
         }); // popup detail pelanggan
-        $(document).on('click', '.view-detail', function () {
             let row = $(this).closest('tr');
-            $('#popupName').text(row.data('name')); $('#popupUsername').text(row.data('username'));
-            $('#popupEmail').text(row.data('email')); $('#popupStatus').text(row.data('status')); $('#detailPopup').fadeIn();
+            $('#popupName').text(row.data('name')); 
+            $('#popupUsername').text(row.data('username'));
+            $('#popupEmail').text(row.data('email')); 
+            $('#popupPhone').text(row.data('phone') || '-');
+            $('#popupStatus').text(row.data('status')); 
+            $('#detailPopup').fadeIn();
         }); $('.popup-close').click(function () { $('#detailPopup').fadeOut(); }); $('#detailPopup').click(function (e) {
             if
                 (e.target.id === 'detailPopup') $(this).fadeOut();
