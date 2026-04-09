@@ -66,7 +66,7 @@
                                         <img src="{{ asset('assets/images/widget/empty-cart.svg') }}" alt="Empty" style="width: 120px; opacity: 0.5;">
                                         <p class="text-muted mt-3">Tidak ada pemesanan yang sedang diproses.</p>
                                     </div>
-                                @&empty
+                                @endforelse
                             </div>
                         </div>
 
