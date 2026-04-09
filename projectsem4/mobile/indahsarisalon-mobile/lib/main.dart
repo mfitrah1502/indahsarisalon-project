@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-=======
-import 'pages/manage_services_page.dart';
->>>>>>> d0ec2cb5aa0b6f4ef4bcf7c648980a12f2c67fe5
 
 void main() async {
   // Wajib dipanggil sebelum fungsi async lainnya di main()
@@ -49,7 +45,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-<<<<<<< HEAD
       title: 'Test Koneksi DB',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -110,14 +105,3 @@ class MyHomePage extends StatelessWidget {
     );
   }
 }
-=======
-      debugShowCheckedModeBanner: false,
-      title: 'Indah Sari Salon',
-      theme: ThemeData(
-        scaffoldBackgroundColor: const Color(0xFFF5F7FB),
-      ),
-      home: const ManageServicesPage(),
-    );
-  }
-}
->>>>>>> d0ec2cb5aa0b6f4ef4bcf7c648980a12f2c67fe5
