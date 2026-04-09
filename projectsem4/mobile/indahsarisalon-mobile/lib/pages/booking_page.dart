@@ -4,7 +4,6 @@ import 'settings_page.dart';
 import 'select_services_page.dart';
 import 'booking_list_page.dart';
 import 'manage_services_page.dart';
-import 'manage_services_page.dart';
 
 class BookingPage extends StatefulWidget {
   const BookingPage({super.key});

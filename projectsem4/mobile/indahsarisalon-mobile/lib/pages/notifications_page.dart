@@ -8,7 +8,7 @@ class NotificationsPage extends StatefulWidget {
   State<NotificationsPage> createState() => _NotificationsPageState();
 }
 
-class _NotificationsPageState extends State<NotificationsPage> {1
+class _NotificationsPageState extends State<NotificationsPage> {
   int _selectedIndex = 0; // Same as home for demonstration
   final Color darkBlue = const Color(0xFF02365A);
   final Color scaffoldBg = const Color(0xFFF6F8FA);
@@ -23,7 +23,10 @@ class _NotificationsPageState extends State<NotificationsPage> {1
           children: [
             // AppBar / Header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 20.0,
+              ),
               child: Row(
                 children: [
                   GestureDetector(
@@ -44,7 +47,7 @@ class _NotificationsPageState extends State<NotificationsPage> {1
                 ],
               ),
             ),
-            
+
             // Subheader (Updates & Mark Read)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -73,7 +76,7 @@ class _NotificationsPageState extends State<NotificationsPage> {1
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 24),
 
             // Notifications List
@@ -94,7 +97,7 @@ class _NotificationsPageState extends State<NotificationsPage> {1
                       ),
                     ),
                     const SizedBox(height: 16),
-                    
+
                     _buildNotificationCard(
                       title: "New Booking",
                       timeText: "10 mins ago",
@@ -106,7 +109,7 @@ class _NotificationsPageState extends State<NotificationsPage> {1
                       showButton: true,
                     ),
                     const SizedBox(height: 16),
-                    
+
                     _buildNotificationCard(
                       title: "Payment Received",
                       timeText: "2 hours ago",
@@ -117,7 +120,7 @@ class _NotificationsPageState extends State<NotificationsPage> {1
                       isUnread: true,
                       showButton: false,
                     ),
-                    
+
                     const SizedBox(height: 32),
 
                     // EARLIER Section
@@ -135,9 +138,12 @@ class _NotificationsPageState extends State<NotificationsPage> {1
                     _buildNotificationCard(
                       title: "System Update",
                       timeText: "1 day ago",
-                      description: "New analytics features are now available in your Report tab.",
+                      description:
+                          "New analytics features are now available in your Report tab.",
                       iconData: Icons.info_outline,
-                      iconBgColor: const Color(0xFFD6E4F0), // slightly different grey/blue
+                      iconBgColor: const Color(
+                        0xFFD6E4F0,
+                      ), // slightly different grey/blue
                       iconColor: const Color(0xFF5A6A7D),
                       isUnread: false,
                       showButton: false,
@@ -154,7 +160,7 @@ class _NotificationsPageState extends State<NotificationsPage> {1
                       isUnread: false,
                       showButton: false,
                     ),
-                    
+
                     const SizedBox(height: 32), // bottom padding
                   ],
                 ),
@@ -163,7 +169,7 @@ class _NotificationsPageState extends State<NotificationsPage> {1
           ],
         ),
       ),
-      
+
       // Bottom Navigation Bar
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -207,22 +213,24 @@ class _NotificationsPageState extends State<NotificationsPage> {1
   }) {
     // If it's unread, we usually have a white background with shadow.
     // If read, a slightly transparent/flat view.
-    Color cardBg = isUnread ? Colors.white : const Color(0xFFF1F4F8); // F1F4F8 matches 'earlier' card style
-    
+    Color cardBg = isUnread
+        ? Colors.white
+        : const Color(0xFFF1F4F8); // F1F4F8 matches 'earlier' card style
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardBg,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: isUnread 
-          ? [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.02),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              )
-            ]
-          : null, // Read items don't have shadow in the image
+        boxShadow: isUnread
+            ? [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.02),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : null, // Read items don't have shadow in the image
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -237,7 +245,7 @@ class _NotificationsPageState extends State<NotificationsPage> {1
             child: Icon(iconData, color: iconColor, size: 28),
           ),
           const SizedBox(width: 16),
-          
+
           // Content
           Expanded(
             child: Column(
@@ -274,14 +282,14 @@ class _NotificationsPageState extends State<NotificationsPage> {1
                               shape: BoxShape.circle,
                             ),
                           ),
-                        ]
+                        ],
                       ],
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 8),
-                
+
                 // Description
                 Text(
                   description,
@@ -291,7 +299,7 @@ class _NotificationsPageState extends State<NotificationsPage> {1
                     height: 1.4,
                   ),
                 ),
-                
+
                 // Optional Action Button
                 if (showButton) ...[
                   const SizedBox(height: 12),
@@ -310,14 +318,17 @@ class _NotificationsPageState extends State<NotificationsPage> {1
                       onPressed: () {},
                       child: const Text(
                         "View Detail",
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
-                ]
+                ],
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -326,8 +337,9 @@ class _NotificationsPageState extends State<NotificationsPage> {1
   Widget _buildNavItem(int index, String label, IconData icon) {
     // For demo, we leave 0 as selected if you just want to mimic the image.
     // However, the image doesn't actually have an active state in this screenshot. Let's make none active or unread the home.
-    final isSelected = false; // The notifications page screenshot shows none of them explicitly active unless they tap it.
-    
+    final isSelected =
+        false; // The notifications page screenshot shows none of them explicitly active unless they tap it.
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -337,11 +349,7 @@ class _NotificationsPageState extends State<NotificationsPage> {1
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            color: isSelected ? darkBlue : mutedText,
-            size: 26,
-          ),
+          Icon(icon, color: isSelected ? darkBlue : mutedText, size: 26),
           const SizedBox(height: 6),
           Text(
             label,
