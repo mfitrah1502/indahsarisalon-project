@@ -43,17 +43,42 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'customer_name' => 'required|string|max:255',
             'treatment_id' => 'required|exists:treatments,id',
-            'stylist_id' => 'required|exists:users,id',
+            'stylist_id' => 'nullable|exists:users,id',
             'reservation_date' => 'required|date',
             'reservation_time' => 'required'
         ]);
 
         $treatment = Treatment::with('details')->findOrFail($request->treatment_id);
-        $total_price = $treatment->details->sum('price');
+        $stylist = $request->stylist_id ? User::find($request->stylist_id) : null;
+
+        $total_price = 0;
+        $booking_details = [];
+
+        foreach ($treatment->details as $detail) {
+            $price = $detail->price;
+            
+            // Logika custom jika detail mengaktifkan harga stylist khusus
+            if ($detail->has_stylist_price) {
+                if ($stylist && strtolower($stylist->kategori) == 'senior') {
+                    $price = $detail->price_senior ?? $price;
+                } elseif ($stylist && strtolower($stylist->kategori) == 'junior') {
+                    $price = $detail->price_junior ?? $price;
+                }
+            }
+
+            $booking_details[] = [
+                'treatment_detail_id' => $detail->id,
+                'price' => $price
+            ];
+            $total_price += $price;
+        }
 
         $booking = Booking::create([
-            'user_id' => Auth::id(),
+            'user_id' => Auth::id(), // ID Akun pembuat booking
+            'customer_name' => $request->customer_name,
+            'cashier_id' => Auth::id(), // Kasir yang login saat itu
             'stylist_id' => $request->stylist_id,
             'treatment_id' => $request->treatment_id,
             'reservation_datetime' => Carbon::parse($request->reservation_date.' '.$request->reservation_time),
@@ -62,11 +87,11 @@ class BookingController extends Controller
             'payment_status' => 'unpaid'
         ]);
 
-        foreach ($treatment->details as $detail) {
+        foreach ($booking_details as $item) {
             BookingDetail::create([
                 'booking_id' => $booking->id,
-                'treatment_detail_id' => $detail->id,
-                'price' => $detail->price
+                'treatment_detail_id' => $item['treatment_detail_id'],
+                'price' => $item['price']
             ]);
         }
 

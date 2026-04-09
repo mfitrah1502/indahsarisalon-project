@@ -10,7 +10,7 @@ class Booking extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'stylist_id', 'treatment_id', 
+        'user_id', 'customer_name', 'cashier_id', 'stylist_id', 'treatment_id', 
         'reservation_datetime', 'total_price', 
         'status', 'payment_status'
     ];
@@ -33,5 +33,10 @@ class Booking extends Model
     public function details()
     {
         return $this->hasMany(BookingDetail::class);
+    }
+
+    public function cashier()
+    {
+        return $this->belongsTo(User::class, 'cashier_id');
     }
 }

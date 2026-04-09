@@ -15,6 +15,9 @@ class TreatmentDetail extends Model
         'duration',
         'description',
         'price',
+        'has_stylist_price',
+        'price_senior',
+        'price_junior',
     ];
 
     // Relasi ke Treatment
