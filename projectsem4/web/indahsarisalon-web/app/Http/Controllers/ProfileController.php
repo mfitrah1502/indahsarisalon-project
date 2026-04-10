@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendOtpMail;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
@@ -27,23 +28,41 @@ class ProfileController extends Controller
 
         $user = auth()->user();
 
-        if ($request->file('avatar')) {
-            // Hapus foto lama jika ada dan bukan default
-            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
-                Storage::disk('public')->delete($user->avatar);
+        if ($request->hasFile('avatar')) {
+            // Hapus foto lama di Supabase jika ada
+            if ($user->avatar) {
+                Http::withHeaders([
+                    'Authorization' => 'Bearer ' . env('SUPABASE_SERVICE_KEY'),
+                    'apikey' => env('SUPABASE_SERVICE_KEY'),
+                ])->delete(env('SUPABASE_URL') . '/storage/v1/object/avatars/' . $user->avatar);
             }
 
-            // Simpan foto baru
-            $fileName = time() . '_' . $user->id . '.' . $request->avatar->extension();
-            $path = $request->file('avatar')->storeAs('avatars', $fileName, 'public');
+            // Simpan foto baru ke Supabase
+            $file = $request->file('avatar');
+            $filename = time() . '_' . $user->id . '.' . $file->getClientOriginalExtension();
+            $fileContents = file_get_contents($file->getRealPath());
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . env('SUPABASE_SERVICE_KEY'),
+                'apikey' => env('SUPABASE_SERVICE_KEY'),
+                'Content-Type' => $file->getMimeType(),
+            ])->withBody($fileContents, $file->getMimeType())
+            ->post(env('SUPABASE_URL') . '/storage/v1/object/avatars/' . $filename);
+
+            if ($response->failed()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal upload ke Supabase: ' . $response->body()
+                ], 500);
+            }
 
             // Update database
-            $user->update(['avatar' => $path]);
+            $user->update(['avatar' => $filename]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Foto profil berhasil diperbarui.',
-                'avatar_url' => asset('storage/' . $path)
+                'avatar_url' => $user->avatar_url
             ]);
         }
 

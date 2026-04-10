@@ -66,7 +66,7 @@
                                         <img src="{{ asset('assets/images/widget/empty-cart.svg') }}" alt="Empty" style="width: 120px; opacity: 0.5;">
                                         <p class="text-muted mt-3">Tidak ada pemesanan yang sedang diproses.</p>
                                     </div>
-                                @&empty
+                                @endforelse
                             </div>
                         </div>
 
@@ -244,10 +244,20 @@
     </div>
 </div>
 
-<!-- Scripts -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
+    // Theme Config (Safe Check)
+    if (typeof layout_change === 'function') {
+        layout_change('light');
+        font_change('Roboto');
+        change_box_container('false');
+        layout_caption_change('true');
+        layout_rtl_change('false');
+        preset_change('preset-1');
+    }
+
     let activeBooking = null;
 
     function showBookingDetail(booking) {
@@ -376,6 +386,7 @@
         $('#btnReset').on('click', () => { $mode.val('all').trigger('change'); });
     });
 </script>
+@endpush
 
 <style>
     .booking-card-user:hover {

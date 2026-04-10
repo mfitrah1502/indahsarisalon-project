@@ -14,8 +14,12 @@
     content="Bootstrap admin template, Dashboard UI Kit, Dashboard Template, Backend Panel, react dashboard, angular dashboard" />
   <meta name="author" content="codedthemes" />
 
+  <base href="{{ url('/') }}/">
   <!-- [Favicon] icon -->
   <link rel="icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/x-icon" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
   <!-- [Google Font] Family -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
     id="main-font-link" />
@@ -30,7 +34,6 @@
   <!-- [Material Icons] https://fonts.google.com/icons -->
   <link rel="stylesheet" href="{{ asset('assets/fonts/material.css') }}" />
   <!-- [Template CSS Files] -->
-  <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" id="main-style-link" />
   <link rel="stylesheet" href="{{ asset('assets/css/style-preset.css') }}" />
 
 </head>
@@ -289,11 +292,14 @@
                     <i class="ti ti-settings"></i>
                     <span>Account Settings</span>
                   </a>
-                  <a href="../application/social-profile.html" class="dropdown-item">
+                  <a href="{{ route('profile') }}" class="dropdown-item">
                     <i class="ti ti-user"></i>
                     <span>Social Profile</span>
                   </a>
-                  <a href="../pages/login-v1.html" class="dropdown-item">
+                  <form id="logout-form-dashboard" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                  </form>
+                  <a href="#" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form-dashboard').submit();">
                     <i class="ti ti-logout"></i>
                     <span>Logout</span>
                   </a>
@@ -492,10 +498,11 @@
     </div>
   </footer>
   <!-- Required Js -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="{{ asset('assets/js/plugins/popper.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/simplebar.min.js') }}"></script>
-  <script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
-  <script src="{{ asset('assets/js/icon/custom-font.js') }}"></script>
+  <script src="{{ asset('assets/js/plugins/bootstrap.min.js') }}"></script>
+  <script src="{{ asset('assets/js/fonts/custom-font.js') }}"></script>
   <script src="{{ asset('assets/js/script.js') }}"></script>
   <script src="{{ asset('assets/js/theme.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/feather.min.js') }}"></script>

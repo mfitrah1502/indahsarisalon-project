@@ -1,360 +1,179 @@
-@extends ('layout.dashboard')
-@section('title', 'Dashboard')
-<!-- [Favicon] icon -->
-<link rel="icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/x-icon" />
-<!-- [Google Font] Family -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-    id="main-font-link" />
-<!-- [phosphor Icons] https://phosphoricons.com/ -->
-<link rel="stylesheet" href="{{ asset('assets/fonts/phosphor/duotone/style.css') }}" />
-<!-- [Tabler Icons] https://tablericons.com -->
-<link rel="stylesheet" href="{{ asset('assets/fonts/tabler-icons.min.css') }}" />
-<!-- [Feather Icons] https://feathericons.com -->
-<link rel="stylesheet" href="{{ asset('assets/fonts/feather.css') }}" />
-<!-- [Font Awesome Icons] https://fontawesome.com/icons -->
-<link rel="stylesheet" href="{{ asset('assets/fonts/fontawesome.css') }}" />
-<!-- [Material Icons] https://fonts.google.com/icons -->
-<link rel="stylesheet" href="{{ asset('assets/fonts/material.css') }}" />
-<!-- [Template CSS Files] -->
-<link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" id="main-style-link" />
-<link rel="stylesheet" href="{{ asset('assets/css/style-preset.css') }}" />
+@extends('layout.dashboard')
+
+@section('title', 'Admin Dashboard')
+
+@push('styles')
+    <style>
+        .welcome-card {
+            background: linear-gradient(135deg, #EA8290 0%, #f7a7b3 100%);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            color: white;
+            border: none;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(234, 130, 144, 0.2);
+        }
+
+        .welcome-content {
+            padding: 40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .welcome-img {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 40%;
+            background-image: url('{{ asset('storage/luxury_salon_dashboard_welcome.png') }}'); /* Replace with actual path or placeholder */
+            background-size: cover;
+            background-position: center;
+            opacity: 0.3;
+            mask-image: linear-gradient(to left, rgba(0, 0, 0, 1) 60%, rgba(0, 0, 0, 0));
+        }
+
+        .stat-card {
+            border: none;
+            border-radius: 20px;
+            background: #ffffff;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .icon-pelanggan { background: #E3F2FD; color: #2196F3; }
+        .icon-pemasukan { background: #E8F5E9; color: #4CAF50; }
+        .icon-bookings { background: #FFF3E0; color: #FF9800; }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Greeting Section */
+        @php
+            $hour = date('H');
+            if ($hour >= 5 && $hour < 11) {
+                $greeting = 'Selamat Pagi';
+            } elseif ($hour >= 11 && $hour < 15) {
+                $greeting = 'Selamat Siang';
+            } elseif ($hour >= 15 && $hour < 18) {
+                $greeting = 'Selamat Sore';
+            } else {
+                $greeting = 'Selamat Malam';
+            }
+        @endphp
+    </style>
+@endpush
 
 @section('content')
-    <!-- [ Main Content ] start -->
-    <div class="pc-container">
-        <div class="pc-content" id="main-content">
-            <!-- [ Main Content ] start -->
-            <div class="row">
-                {{-- <div class="col-6">
-                    <button id="btn-absen-masuk" class="btn btn-success w-100">Absen Masuk</button>
+    <div class="row">
+        <!-- Welcome Hero Section -->
+        <div class="col-12">
+            <div class="card welcome-card">
+                <div class="welcome-img"></div>
+                <div class="welcome-content">
+                    <h1 class="text-white mb-2 fw-bold">{{ $greeting }}, {{ Auth::user()->name }}!</h1>
+                    <p class="text-white opacity-75 mb-0" style="max-width: 500px;">
+                        Senang melihat Anda kembali. Berikut adalah ringkasan performa Indah Sari Salon hari ini. Tetap berikan layanan terbaik untuk pelanggan kita!
+                    </p>
                 </div>
-                <div class="col-6">
-                    <button id="btn-absen-keluar" class="btn btn-danger w-100">Absen Keluar</button>
-                </div> --}}
-                <!-- [ sample-page ] start -->
-                <div class="col-xl-4 col-md-6">
-                    <div class="card bg-secondary-dark dashnum-card text-white overflow-hidden">
-                        <span class="round small"></span>
-                        <span class="round big"></span>
-                        <div class="card-body">
-                            <div class="row">
-                                {{-- <div class="col">
-                                    <div class="avtar avtar-lg">
-                                        <i class="text-white ti ti-credit-card"></i>
-                                    </div>
-                                </div> --}}
-                                {{-- <div class="col-auto">
-                                    <div class="btn-group">
-                                        <a href="#" class="avtar avtar-s bg-secondary text-white dropdown-toggle arrow-none"
-                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="ti ti-dots"></i>
-                                        </a>
-                                        <ul class="dropdown-menu dropdown-menu-end">
-                                            <li><button class="dropdown-item">Import Card</button></li>
-                                            <li><button class="dropdown-item">Export</button></li>
-                                        </ul>
-                                    </div>
-                                </div> --}}
-                            </div>
-                            <span class="text-white d-block f-34 f-w-500 my-2">
-                                10
-                                <i class="ti ti-arrow-up-right-circle opacity-50"></i>
-                            </span>
-                            <p class="mb-0 opacity-50">Total Pelanggan</p>
-                        </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Stats -->
+        <div class="col-xl-4 col-md-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="stat-icon icon-pelanggan">
+                        <i class="ti ti-users"></i>
                     </div>
+                    <div class="stat-value">{{ number_format($stats['total_pelanggan']) }}</div>
+                    <div class="stat-label">Total Pelanggan</div>
                 </div>
+            </div>
+        </div>
 
-
-                <div class="col-xl-4 col-md-6">
-                    <div class="card bg-primary-dark dashnum-card text-white overflow-hidden">
-                        <span class="round small"></span>
-                        <span class="round big"></span>
-                        <div class="card-body">
-                            <div class="row">
-                                {{-- <div class="col">
-                                    <div class="avtar avtar-lg">
-                                        <i class="text-white ti ti-credit-card"></i>
-                                    </div>
-                                </div> --}}
-                                <div class="col-auto">
-                                    <ul class="nav nav-pills justify-content-end mb-0" id="chart-tab-tab" role="tablist">
-                                        <li class="nav-item" role="presentation">
-                                            <button class="nav-link text-white active" id="chart-tab-home-tab"
-                                                data-bs-toggle="pill" data-bs-target="#chart-tab-home" role="tab"
-                                                aria-controls="chart-tab-home" aria-selected="true">
-                                                Day
-                                            </button>
-                                        </li>
-                                        <li class="nav-item" role="presentation">
-                                            <button class="nav-link text-white" id="chart-tab-home-tab"
-                                                data-bs-toggle="pill" data-bs-target="#chart-tab-home" role="tab"
-                                                aria-controls="chart-tab-home" aria-selected="false">
-                                                Month
-                                            </button>
-                                        </li>
-                                        <li class="nav-item" role="presentation">
-                                            <button class="nav-link text-white" id="chart-tab-profile-tab"
-                                                data-bs-toggle="pill" data-bs-target="#chart-tab-profile" role="tab"
-                                                aria-controls="chart-tab-profile" aria-selected="false">
-                                                Year
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="tab-content" id="chart-tab-tabContent">
-                                <div class="tab-pane show active" id="chart-tab-home" role="tabpanel"
-                                    aria-labelledby="chart-tab-home-tab" tabindex="0">
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <span class="text-white d-block f-34 f-w-500 my-2">
-                                                Rp.100.000
-                                                <i class="ti ti-arrow-up-right-circle opacity-50"></i>
-                                            </span>
-                                            <p class="mb-0 opacity-50">Total Pengeluaran</p>
-                                        </div>
-                                        <div class="col-6">
-                                            <div id="tab-chart-1"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tab-pane" id="chart-tab-profile" role="tabpanel"
-                                    aria-labelledby="chart-tab-profile-tab" tabindex="0">
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <span class="text-white d-block f-34 f-w-500 my-2">
-                                                $291
-                                                <i class="ti ti-arrow-down-right-circle opacity-50"></i>
-                                            </span>
-                                            <p class="mb-0 opacity-50">C/W Last Year</p>
-                                        </div>
-                                        <div class="col-6">
-                                            <div id="tab-chart-2"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        <div class="col-xl-4 col-md-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="stat-icon icon-pemasukan">
+                        <i class="ti ti-cash"></i>
                     </div>
+                    <div class="stat-value">Rp {{ number_format($stats['total_pemasukan'], 0, ',', '.') }}</div>
+                    <div class="stat-label">Total Pemasukan</div>
                 </div>
-                {{-- pemasukan --}}
-                <div class="col-xl-4 col-md-6">
-                    <div class="card bg-primary-dark dashnum-card text-white overflow-hidden">
-                        <span class="round small"></span>
-                        <span class="round big"></span>
-                        <div class="card-body">
-                            <div class="row">
-                                {{-- <div class="col">
-                                    <div class="avtar avtar-lg">
-                                        <i class="text-white ti ti-credit-card"></i>
-                                    </div>
-                                </div> --}}
-                                <div class="col-auto">
-                                    <ul class="nav nav-pills justify-content-end mb-0" id="chart-tab-tab" role="tablist">
-                                        <li class="nav-item" role="presentation">
-                                            <button class="nav-link text-white active" id="chart-tab-home-tab"
-                                                data-bs-toggle="pill" data-bs-target="#chart-tab-home" role="tab"
-                                                aria-controls="chart-tab-home" aria-selected="true">
-                                                Day
-                                            </button>
-                                        </li>
-                                        <li class="nav-item" role="presentation">
-                                            <button class="nav-link text-white" id="chart-tab-home-tab"
-                                                data-bs-toggle="pill" data-bs-target="#chart-tab-home" role="tab"
-                                                aria-controls="chart-tab-home" aria-selected="false">
-                                                Month
-                                            </button>
-                                        </li>
-                                        <li class="nav-item" role="presentation">
-                                            <button class="nav-link text-white" id="chart-tab-profile-tab"
-                                                data-bs-toggle="pill" data-bs-target="#chart-tab-profile" role="tab"
-                                                aria-controls="chart-tab-profile" aria-selected="false">
-                                                Year
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="tab-content" id="chart-tab-tabContent">
-                                <div class="tab-pane show active" id="chart-tab-home" role="tabpanel"
-                                    aria-labelledby="chart-tab-home-tab" tabindex="0">
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <span class="text-white d-block f-34 f-w-500 my-2">
-                                                Rp.100.000
-                                                <i class="ti ti-arrow-up-right-circle opacity-50"></i>
-                                            </span>
-                                            <p class="mb-0 opacity-50">Total Pemasukan</p>
-                                        </div>
-                                        <div class="col-6">
-                                            <div id="tab-chart-1"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tab-pane" id="chart-tab-profile" role="tabpanel"
-                                    aria-labelledby="chart-tab-profile-tab" tabindex="0">
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <span class="text-white d-block f-34 f-w-500 my-2">
-                                                $291
-                                                <i class="ti ti-arrow-down-right-circle opacity-50"></i>
-                                            </span>
-                                            <p class="mb-0 opacity-50">C/W Last Year</p>
-                                        </div>
-                                        <div class="col-6">
-                                            <div id="tab-chart-2"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="stat-icon icon-bookings">
+                        <i class="ti ti-calendar-check"></i>
                     </div>
+                    <div class="stat-value">{{ number_format($stats['today_bookings']) }}</div>
+                    <div class="stat-label">Booking Hari Ini</div>
                 </div>
-                {{-- <div class="col-xl-4 col-md-12">
-                    <div class="card bg-primary-dark dashnum-card dashnum-card-small text-white overflow-hidden">
-                        <span class="round bg-primary small"></span>
-                        <span class="round bg-primary big"></span>
-                        <div class="card-body p-3">
-                            <div class="d-flex align-items-center">
-                                <div class="avtar avtar-lg">
-                                    <i class="text-white ti ti-credit-card"></i>
-                                </div>
-                                <div class="ms-2">
-                                    <h4 class="text-white mb-1">Rp.300.000</h4>
-                                    <p class="mb-0 opacity-75 text-sm">Total Pemasukan</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div> --}}
+            </div>
+        </div>
 
-                    {{-- <div class="card dashnum-card dashnum-card-small overflow-hidden">
-                        <span class="round bg-warning small"></span>
-                        <span class="round bg-warning big"></span>
-                        <div class="card-body p-3">
-                            <div class="d-flex align-items-center">
-                                <div class="avtar avtar-lg bg-light-warning">
-                                    <i class="text-warning ti ti-credit-card"></i>
-                                </div>
-                                <div class="ms-2">
-                                    <h4 class="mb-1">$203k</h4>
-                                    <p class="mb-0 opacity-75 text-sm">Total Pemasukan</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div> --}}
+        <!-- Optional: Placeholder for Growth Chart if needed -->
+        <div class="col-12 mt-4">
+            <div class="card border-0 shadow-sm" style="border-radius: 20px;">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">Statistik Pertumbuhan</h5>
+                    <select class="form-select w-auto border-0 bg-light small">
+                        <option>This Month</option>
+                        <option>This Year</option>
+                    </select>
                 </div>
-
-                <div class="col-xl-10 col-md-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row mb-3 align-items-center">
-                                <div class="col">
-                                    <small class="text-muted">Profit</small>
-                                    <h3>Rp.200.000</h3>
-                                </div>
-                                <div class="col-auto">
-                                    <select class="form-select p-r-35">
-                                        <option>Today</option>
-                                        <option selected>This Month</option>
-                                        <option>This Year</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div id="growthchart"></div>
+                <div class="card-body px-4 pb-4">
+                    <div id="growth-chart" style="min-height: 350px;">
+                        <!-- ApexCharts will be rendered here -->
+                        <div class="text-center py-5">
+                            <i class="ti ti-chart-line text-muted f-30"></i>
+                            <p class="text-muted mt-2">Data pertumbuhan akan segera tersedia.</p>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- [ sample-page ] end -->
         </div>
-        <!-- [ Main Content ] end -->
     </div>
-    </div>
-    <!-- [ Main Content ] end -->
-    <!-- Required Js -->
-    <script src="{{ asset('assets/js/plugins/popper.min.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/simplebar.min.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('assets/js/fonts/custom-font.js') }}"></script>
-    <script src="{{ asset('assets/js/script.js') }}"></script>
-    <script src="{{ asset('assets/js/theme.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/feather.min.js') }}"></script>
-
-    <script>
-        layout_change('light');
-    </script>
-    <script>
-        font_change('Roboto');
-    </script>
-    <script>
-        change_box_container('false');
-    </script>
-    <script>
-        layout_caption_change('true');
-    </script>
-    <script>
-        layout_rtl_change('false');
-    </script>
-    <script>
-        preset_change('preset-1');
-    </script>
-    <!-- [Page Specific JS] start -->
-    <!-- Apex Chart -->
-    <script src="/assets/js/plugins/apexcharts.min.js"></script>
-    <script src="/assets/js/pages/dashboard-default.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-
-            document.querySelectorAll(".pc-link").forEach(link => {
-
-                link.addEventListener("click", function (e) {
-
-                    let url = this.getAttribute("href");
-
-                    if (!url || url === "#" || url.startsWith("http")) return;
-
-                    e.preventDefault();
-
-                    fetch(url, {
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    })
-                        .then(res => res.text())
-                        .then(data => {
-                            document.querySelector("#main-content").innerHTML = data;
-                            window.history.pushState({}, "", url);
-                        });
-
-                });
-
-            });
-
-        });
-        // document.getElementById('btn-absen-masuk').addEventListener('click', function () {
-        //     fetch("{{ route('absensi.masuk') }}", {
-        //         method: "POST",
-        //         headers: {
-        //             "X-CSRF-TOKEN": "{{ csrf_token() }}",
-        //             "Accept": "application/json",
-        //         },
-        //     })
-        //         .then(res => res.json())
-        //         .then(res => alert(res.message));
-        // });
-
-        // document.getElementById('btn-absen-keluar').addEventListener('click', function () {
-        //     fetch("{{ route('absensi.keluar') }}", {
-        //         method: "POST",
-        //         headers: {
-        //             "X-CSRF-TOKEN": "{{ csrf_token() }}",
-        //             "Accept": "application/json",
-        //         },
-        //     })
-        //         .then(res => res.json())
-        //         .then(res => alert(res.message));
-        // });
-    </script>
-    <!-- [Page Specific JS] end -->
 @endsection
+
+@push('scripts')
+    <!-- Apex Chart could be re-added here if needed -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        // Simple placeholder for now to avoid errors if scripts refer to it
+        document.addEventListener('DOMContentLoaded', function() {
+            // Future chart initialization here
+        });
+    </script>
+@endpush

@@ -1,16 +1,6 @@
 @extends('layout.dashboard')
 
 @section('title', 'Manajemen Booking')
-<link rel="icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/x-icon" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-    id="main-font-link" />
-<link rel="stylesheet" href="{{ asset('assets/fonts/phosphor/duotone/style.css') }}" />
-<link rel="stylesheet" href="{{ asset('assets/fonts/tabler-icons.min.css') }}" />
-<link rel="stylesheet" href="{{ asset('assets/fonts/feather.css') }}" />
-<link rel="stylesheet" href="{{ asset('assets/fonts/fontawesome.css') }}" />
-<link rel="stylesheet" href="{{ asset('assets/fonts/material.css') }}" />
-<link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" id="main-style-link" />
-<link rel="stylesheet" href="{{ asset('assets/css/style-preset.css') }}" />
 <style>
     .table > :not(caption) > * > * {
         padding: 1.25rem 1rem; /* Biar tabel lebih besar/luas */
@@ -284,22 +274,18 @@
     </div>
 </div>
 
-<script src="{{ asset('assets/js/plugins/popper.min.js') }}"></script>
-<script src="{{ asset('assets/js/plugins/simplebar.min.js') }}"></script>
-<script src="{{ asset('assets/js/plugins/bootstrap.min.js') }}"></script>
-<script src="{{ asset('assets/js/fonts/custom-font.js') }}"></script>
-<script src="{{ asset('assets/js/script.js') }}"></script>
-<script src="{{ asset('assets/js/theme.js') }}"></script>
-<script src="{{ asset('assets/js/plugins/feather.min.js') }}"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+@push('scripts')
 <script>
-    layout_change('light');
-    font_change('Roboto');
-    change_box_container('false');
-    layout_caption_change('true');
-    layout_rtl_change('false');
-    preset_change('preset-1');
+    // Initial Config (Safe Check)
+    if (typeof layout_change === 'function') {
+        layout_change('light');
+        font_change('Roboto');
+        change_box_container('false');
+        layout_caption_change('true');
+        layout_rtl_change('false');
+        preset_change('preset-1');
+    }
+
     $(document).ready(function() {
         $('#filterMode').on('change', function() {
             const mode = $(this).val();
@@ -323,4 +309,6 @@
         });
     });
 </script>
+@endpush
+
 @endsection
