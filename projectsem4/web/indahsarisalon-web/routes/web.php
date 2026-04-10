@@ -54,16 +54,25 @@ Route::post('/reset-password/otp', [PasswordResetController::class, 'resetPasswo
 // ------------------------------
 // Routes yang membutuhkan auth + session timeout
 // ------------------------------
-Route::middleware(['auth', 'session.timeout'])->group(function () {
-    Route::get('/profile', function () {
-    return view('profile.index');
-})->middleware('auth')->name('profile');
+Route::middleware(['auth', 'session.timeout', 'prevent-back'])->group(function () {
+    // ------------------------------
+    // Profile
+    // ------------------------------
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [App\Http\Controllers\ProfileController::class, 'index'])->name('index');
+        Route::post('/update', [App\Http\Controllers\ProfileController::class, 'updateProfile'])->name('update-info');
+        Route::post('/change-password', [App\Http\Controllers\ProfileController::class, 'changePassword'])->name('change-password');
+        Route::post('/avatar-update', [App\Http\Controllers\ProfileController::class, 'updateAvatar'])->name('avatar.update');
+        Route::post('/otp-send', [App\Http\Controllers\ProfileController::class, 'sendOtp'])->name('otp.send');
+        Route::post('/otp-verify', [App\Http\Controllers\ProfileController::class, 'verifyAndReset'])->name('otp.verify');
+    });
+    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'index'])->name('profile');
 
     // ------------------------------
     // Dashboard
     // ------------------------------
-    Route::get('/dashboard', fn() => view('dashboard.homepage'))->name('dashboard');
-    Route::get('/dashboard/user', fn() => view('dashboard.homepage-user'))->name('dashboard.user');
+    Route::get('/dashboard', [PageController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard/user', [PageController::class, 'dashboard'])->name('dashboard.user');
 
     // ------------------------------
     // Produk / Pelanggan
@@ -87,20 +96,29 @@ Route::middleware(['auth', 'session.timeout'])->group(function () {
     Route::get('/about', [PageController::class, 'about'])->name('about');
 
     // ------------------------------
+    // Management (Admin & Karyawan) - Pindahkan ke atas agar tidak bentrok dengan resource karyawan
+    // ------------------------------
+    Route::middleware('role:admin,karyawan')->group(function () {
+        // Booking Management (Shared Logic)
+        Route::get('/admin/bookings', [BookingController::class, 'adminIndex'])->name('admin.bookings.index');
+        Route::get('/karyawan/bookings', [BookingController::class, 'adminIndex'])->name('karyawan.bookings.index');
+        Route::patch('/admin/bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('admin.bookings.updateStatus');
+    });
+
+    // ------------------------------
     // Karyawan
     // ------------------------------
     Route::resource('karyawan', KaryawanController::class);
     Route::get('/karyawan/{id}/absensi', [KaryawanController::class, 'absensi'])->name('karyawan.absensi');
 
     // ------------------------------
-    // Absensi Kasir
+    // Absensi Kasir/Karyawan
     // ------------------------------
-    Route::prefix('absensi')->middleware('role:karyawan')->group(function () {
-        Route::post('/masuk', [AbsensiController::class, 'masuk'])->name('absensi.masuk');
-        Route::post('/keluar', [AbsensiController::class, 'keluar'])->name('absensi.keluar');
-        Route::post('/absen/masuk', [AbsensiController::class, 'absenMasuk'])->name('absensi.masuk');
-        Route::post('/absen/keluar', [AbsensiController::class, 'absenKeluar'])->name('absensi.keluar');
+    Route::prefix('absensi')->middleware('role:admin,karyawan')->group(function () {
+        Route::post('/masuk', [AbsensiController::class, 'absenMasuk'])->name('absensi.masuk');
+        Route::post('/keluar', [AbsensiController::class, 'absenKeluar'])->name('absensi.keluar');
     });
+
 
     // ------------------------------
     // Admin only
@@ -127,12 +145,14 @@ Route::middleware(['auth', 'session.timeout'])->group(function () {
 // });
 // // Route baru untuk summary
 //     Route::post('/summary', [BookingController::class, 'summary'])->name('booking.summary');
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'prevent-back'])->group(function () {
     Route::get('/booking', [BookingController::class, 'index'])->name('booking.index'); // halaman daftar treatment
     Route::get('/booking/select/{treatmentId?}', [BookingController::class, 'select'])->name('booking.select'); // step 1
     Route::post('/booking/store', [BookingController::class, 'store'])->name('booking.store'); // simpan booking
     Route::get('/booking/summary/{bookingId}', [BookingController::class, 'summary'])->name('booking.summary'); // step summary
     Route::post('/booking/pay/{bookingId}', [BookingController::class, 'pay'])->name('booking.pay'); // bayar
     Route::get('/booking/history', [BookingController::class, 'history'])->name('booking.history'); // riwayat
+    Route::post('/booking/{id}/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
+    Route::post('/booking/notification', [BookingController::class, 'handleNotification'])->name('booking.notification'); // webhook
 });
 });

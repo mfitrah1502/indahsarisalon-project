@@ -36,6 +36,11 @@
                                 value="{{ old('email', $pelanggan->email) }}" required>
                         </div>
                         <div class="mb-3">
+                            <label>Nomor Telepon</label>
+                            <input type="text" name="phone" class="form-control"
+                                value="{{ old('phone', $pelanggan->phone) }}" required placeholder="Contoh: 08123456789">
+                        </div>
+                        <div class="mb-3">
                             <label>Password <small>(kosongkan jika tidak ingin ganti)</small></label>
                             <input type="password" name="password" class="form-control">
                         </div>

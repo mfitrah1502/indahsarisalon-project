@@ -1,16 +1,6 @@
 @extends('layout.dashboard')
 
 @section('title', 'Book an Appointment')
-<link rel="icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/x-icon" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-    id="main-font-link" />
-<link rel="stylesheet" href="{{ asset('assets/fonts/phosphor/duotone/style.css') }}" />
-<link rel="stylesheet" href="{{ asset('assets/fonts/tabler-icons.min.css') }}" />
-<link rel="stylesheet" href="{{ asset('assets/fonts/feather.css') }}" />
-<link rel="stylesheet" href="{{ asset('assets/fonts/fontawesome.css') }}" />
-<link rel="stylesheet" href="{{ asset('assets/fonts/material.css') }}" />
-<link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" id="main-style-link" />
-<link rel="stylesheet" href="{{ asset('assets/css/style-preset.css') }}" />
 
 <style>
     .treatment-card {
@@ -74,10 +64,12 @@
                         @foreach($treatments as $treatment)
                             <div class="col-md-4 mb-4">
                                 <div class="card treatment-card h-100 border-0 shadow-sm">
-                                    @if($treatment->image)
-                                        <img src="{{ env('SUPABASE_URL') . '/storage/v1/object/' . env('SUPABASE_BUCKET') . '/' . $treatment->image }}"
-                                            class="card-img-top" alt="{{ $treatment->name }}">
-                                    @endif
+                                    @php
+                                        $imageUrl = $treatment->image 
+                                            ? env('SUPABASE_URL') . '/storage/v1/object/public/' . env('SUPABASE_BUCKET') . '/' . $treatment->image 
+                                            : asset('assets/images/no-image.jpg');
+                                    @endphp
+                                    <img src="{{ $imageUrl }}" class="card-img-top" alt="{{ $treatment->name }}">
                                     <div class="card-body">
                                         <h5 class="card-title">{{ $treatment->name }}</h5>
                                         <p class="card-text">
@@ -101,13 +93,6 @@
     </div>
 
     <!-- Required JS -->
-    <script src="{{ asset('assets/js/plugins/popper.min.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/simplebar.min.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('assets/js/fonts/custom-font.js') }}"></script>
-    <script src="{{ asset('assets/js/script.js') }}"></script>
-    <script src="{{ asset('assets/js/theme.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/feather.min.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>

@@ -38,6 +38,7 @@ class PelangganController extends Controller
             'name'     => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users,username',
             'email'    => 'required|email|unique:users,email',
+            'phone'    => 'required|string|max:15',
             'password' => 'required|string|min:6|confirmed',
             'status'   => 'required|in:aktif,tidak',
         ]);
@@ -46,6 +47,7 @@ class PelangganController extends Controller
             'name'     => $request->name,
             'username' => $request->username,
             'email'    => $request->email,
+            'phone'    => $request->phone,
             'password' => Hash::make($request->password),
             'role'     => 'pelanggan', // selalu pelanggan
             'type'     => 'pelanggan',
@@ -67,6 +69,7 @@ class PelangganController extends Controller
         $pelanggan->name     = $request->name;
         $pelanggan->username = $request->username;
         $pelanggan->email    = $request->email;
+        $pelanggan->phone    = $request->phone;
         $pelanggan->status   = $request->status;
         $pelanggan->type     = 'pelanggan';
 

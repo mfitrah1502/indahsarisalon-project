@@ -51,6 +51,11 @@
                                 value="{{ old('email', $karyawan->email) }}" required>
                         </div>
                         <div class="mb-3">
+                            <label>Nomor Telepon</label>
+                            <input type="text" name="phone" class="form-control"
+                                value="{{ old('phone', $karyawan->phone) }}" required placeholder="Contoh: 08123456789">
+                        </div>
+                        <div class="mb-3">
                             <label>Role</label>
                             <select name="role" class="form-select" required id="roleSelect">
                                 <option value="admin" {{ $karyawan->role == 'admin' ? 'selected' : '' }}>Admin</option>
@@ -64,9 +69,8 @@
                             <label>Kategori</label>
                             <select name="kategori" class="form-select" id="kategoriSelect">
                                 <option value="">-- Pilih Kategori --</option>
-                                <option value="stylist" {{ old('kategori', $karyawan->kategori) == 'stylist' ? 'selected' : '' }}>Stylist</option>
-                                <option value="biasa" {{ old('kategori', $karyawan->kategori) == 'biasa' ? 'selected' : '' }}>
-                                    Biasa</option>
+                                <option value="senior" {{ old('kategori', $karyawan->kategori) == 'senior' ? 'selected' : '' }}>Senior</option>
+                                <option value="junior" {{ old('kategori', $karyawan->kategori) == 'junior' ? 'selected' : '' }}>Junior</option>
                             </select>
                         </div>
                         <div class="mb-3">

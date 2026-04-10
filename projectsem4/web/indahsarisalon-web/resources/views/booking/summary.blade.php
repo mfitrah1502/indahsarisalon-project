@@ -20,6 +20,7 @@
 <!-- [Template CSS Files] -->
 <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" id="main-style-link" />
 <link rel="stylesheet" href="{{ asset('assets/css/style-preset.css') }}" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 @section('content')
     <div class="row">
@@ -39,7 +40,7 @@
                     </p>
 
                     <h5>Stylist</h5>
-                    <p>{{ $stylist->name }}</p>
+                    <p>{{ $stylist->name ?? '-' }}</p>
 
                     <h5>Waktu Reservasi</h5>
                     <p>{{ \Carbon\Carbon::parse($reservation_datetime)->format('d M Y H:i') }}</p>
@@ -47,15 +48,64 @@
                     <h5>Total Biaya</h5>
                     <p>Rp {{ number_format($total_price, 0) }}</p>
 
-                    <form action="{{ route('booking.confirm') }}" method="POST" id="bookingForm">
-                        @csrf
-                        <input type="hidden" name="treatment_id" value="{{ $treatment->id }}">
-                        <input type="hidden" name="stylist_id" value="{{ $stylist->id }}">
-                        <input type="hidden" name="reservation_datetime" value="{{ $reservation_datetime }}">
-                        <input type="hidden" name="total_price" value="{{ $total_price }}">
+                    <div class="mt-4">
+                        @if ($booking->payment_status == 'unpaid' && $booking->payment_method == 'transfer' && $booking->snap_token)
+                            <button class="btn btn-primary" id="pay-button">Bayar Sekarang (Midtrans)</button>
+                        @elseif($booking->payment_status == 'unpaid' && $booking->payment_method == 'cash')
+                            <div class="alert alert-info">
+                                Silakan lakukan pembayaran tunai di kasir.
+                            </div>
+                            <a href="{{ route('booking.history') }}" class="btn btn-secondary">Lihat Riwayat Booking</a>
+                        @else
+                            <div class="alert alert-success">
+                                Booking Berhasil Dikonfirmasi!
+                            </div>
+                            <a href="{{ route('booking.history') }}" class="btn btn-primary">Lihat Riwayat Booking</a>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                        <button type="submit" class="btn btn-success" id="confirmBtn">Konfirmasi & Bayar</button>
-                    </form>
+    <!-- Midtrans Snap JS -->
+    <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+    
+    <script type="text/javascript">
+        document.getElementById('pay-button')?.onclick = function() {
+            snap.pay('{{ $booking->snap_token }}', {
+                onSuccess: function(result) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Pembayaran Berhasil!',
+                        text: 'Terima kasih, pembayaran Anda telah kami terima.',
+                        showConfirmButton: false,
+                        timer: 2500
+                    }).then(() => {
+                        window.location.href = "{{ route('booking.history') }}";
+                    });
+                },
+                onPending: function(result) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Pembayaran Tertaut!',
+                        text: 'Silakan selesaikan pembayaran sesuai instruksi di Midtrans.',
+                        showConfirmButton: true
+                    }).then(() => {
+                        window.location.href = "{{ route('booking.history') }}";
+                    });
+                },
+                onError: function(result) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Pembayaran Gagal',
+                        text: 'Terjadi kesalahan saat memproses pembayaran. Silakan coba lagi.'
+                    });
+                }
+            });
+        };
+    </script>
                 </div>
             </div>
         </div>

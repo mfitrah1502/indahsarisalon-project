@@ -18,21 +18,19 @@
                 </li>
 
                 <li class="pc-item pc-caption">
-                    <label>Manajemen</label>
+                    <label>Menu Manajemen</label>
                     <i class="ti ti-apps"></i>
                 </li>
+
+                <!-- MENU KHUSUS ADMIN -->
                 <li class="pc-item pc-hasmenu">
-                    <a class="pc-link"><span class="pc-micon"><i class="ti ti-menu"></i></span><span
+                    <a class="pc-link"><span class="pc-micon"><i class="ti ti-users"></i></span><span
                             class="pc-mtext">Manajemen</span><span class="pc-arrow"><i
                                 data-feather="chevron-right"></i></span></a>
                     <ul class="pc-submenu">
-                        <li class="pc-item"><a href="{{ route('karyawan.index') }}" class="pc-link">Manajemen
-                                Karyawan</a>
-                        </li>
-                        <li class="pc-item"><a href="{{ route('pelanggan.index') }}" class="pc-link">Manajemen
-                                Pelanggan</a></li>
-                        <li class="pc-item"><a href="{{ route('treatment.index') }}" class="pc-link">Manajemen
-                                Treatment</a></li>
+                        <li class="pc-item"><a href="{{ route('karyawan.index') }}" class="pc-link">Manajemen Karyawan</a></li>
+                        <li class="pc-item"><a href="{{ route('pelanggan.index') }}" class="pc-link">Manajemen Pelanggan</a></li>
+                        <li class="pc-item"><a href="{{ route('treatment.index') }}" class="pc-link">Manajemen Treatment</a></li>
                     </ul>
                 </li>
                 <li class="pc-item pc-hasmenu">
@@ -44,7 +42,9 @@
                         <li class="pc-item"><a class="pc-link" href="#!">Pengeluaran</a></li>
                     </ul>
                 </li>
-                <li class="pc-item pc-hasmenu {{ request()->is('booking*') ? 'active pc-trigger' : '' }}">
+
+                <!-- MENU BOOKING -->
+                <li class="pc-item pc-hasmenu {{ request()->is('booking*') || request()->is('admin/bookings*') ? 'active pc-trigger' : '' }}">
                     <a class="pc-link">
                         <span class="pc-micon"><i class="ti ti-calendar"></i></span>
                         <span class="pc-mtext">Booking</span>
@@ -53,8 +53,10 @@
                     <ul class="pc-submenu">
                         <li class="pc-item"><a class="pc-link {{ request()->is('booking') ? 'active' : '' }}"
                                 href="{{ route('booking.index') }}">Book An Appointment</a></li>
-                        <li class="pc-item"><a class="pc-link {{ request()->is('booking/select*') ? 'active' : '' }}"
-                                href="{{ route('booking.select', ['treatmentId' => 1]) }}">Status Pemesanan</a></li>
+
+                        <li class="pc-item"><a class="pc-link {{ request()->is('admin/bookings*') ? 'active' : '' }}"
+                                href="{{ route('admin.bookings.index') }}">Status Pemesanan</a></li>
+
                         <li class="pc-item"><a class="pc-link {{ request()->is('booking/history') ? 'active' : '' }}"
                                 href="{{ route('booking.history') }}">Riwayat Pemesanan</a></li>
                     </ul>
@@ -67,31 +69,6 @@
                     </a>
                 </li> --}}
 
-                <li class="pc-item pc-caption">
-                    <label>Other</label>
-                    <i class="ti ti-brand-chrome"></i>
-                </li>
-                <li class="pc-item"><a class="pc-link" href="{{ route('about') }}">
-                        <span class="pc-micon"><i class="ti ti-info-circle"></i></span>
-                        <span class="pc-mtext">About Us</span>
-                    </a>
-                </li>
-                <li class="pc-item"><a class="pc-link" href="#!">
-                        <span class="pc-micon"><i class="ti ti-star"></i></span>
-                        <span class="pc-mtext">Rating</span>
-                    </a>
-                </li>
-
-                <li class="pc-item pc-caption">
-                    <label>Logout</label>
-                    <i class="ti ti-logout"></i>
-                </li>
-                <li class="pc-item">
-                    <a class="pc-link" href="{{ route('auth') }}">
-                        <span class="pc-micon"><i class="ti ti-lock"></i></span>
-                        <span class="pc-mtext">Logout</span>
-                    </a>
-                </li>
             </ul>
             {{-- <div class="pc-navbar-card bg-primary rounded">
                 <h4 class="text-white">Explore full code</h4>

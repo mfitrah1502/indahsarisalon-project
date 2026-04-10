@@ -1,24 +1,6 @@
 @extends('layout.dashboard')
 
 @section('title', 'Manajemen Karyawan')
-<!-- [Favicon] icon -->
-<link rel="icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/x-icon" />
-<!-- [Google Font] Family -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-    id="main-font-link" />
-<!-- [phosphor Icons] -->
-<link rel="stylesheet" href="{{ asset('assets/fonts/phosphor/duotone/style.css') }}" />
-<!-- [Tabler Icons] -->
-<link rel="stylesheet" href="{{ asset('assets/fonts/tabler-icons.min.css') }}" />
-<!-- [Feather Icons] -->
-<link rel="stylesheet" href="{{ asset('assets/fonts/feather.css') }}" />
-<!-- [Font Awesome Icons] -->
-<link rel="stylesheet" href="{{ asset('assets/fonts/fontawesome.css') }}" />
-<!-- [Material Icons] -->
-<link rel="stylesheet" href="{{ asset('assets/fonts/material.css') }}" />
-<!-- [Template CSS Files] -->
-<link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" id="main-style-link" />
-<link rel="stylesheet" href="{{ asset('assets/css/style-preset.css') }}" />
 
 @section('content')
     <div class="row">
@@ -48,6 +30,7 @@
                                 <th>Nama</th>
                                 <th>Username</th>
                                 <th>Email</th>
+                                <th>Telepon</th>
                                 <th>Role</th>
                                 <th>Status</th>
                                 <th width="150">Aksi</th>
@@ -63,6 +46,7 @@
                                         </a></td>
                                     <td>{{ $karyawan->username }}</td>
                                     <td>{{ $karyawan->email }}</td>
+                                    <td>{{ $karyawan->phone ?? '-' }}</td>
                                     <td>{{ ucfirst($karyawan->role) }}</td>
                                     <td>{{ ucfirst($karyawan->status) }}</td>
 
@@ -92,12 +76,33 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Riwayat Absensi</h5>
+                    <h5 class="modal-title">Riwayat Presensi: <span id="employeeName"></span></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <table class="table table-bordered">
-                        <thead>
+                    <!-- Filter Section -->
+                    <div class="row g-2 mb-4 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Jenis Filter</label>
+                            <select id="filterType" class="form-select">
+                                <option value="all">Semua Data</option>
+                                <option value="harian">Harian</option>
+                                <option value="bulanan">Bulanan</option>
+                                <option value="tahunan">Tahunan</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5" id="filterInputContainer" style="display:none;">
+                            <label class="form-label small fw-bold" id="filterInputLabel">Pilih Tanggal</label>
+                            <input type="date" id="filterValue" class="form-control">
+                        </div>
+                        <div class="col-md-3" id="filterActionContainer" style="display:none;">
+                            <button id="btnResetFilter" class="btn btn-light-secondary w-100">Reset</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead class="table-light sticky-top">
                             <tr>
                                 <th>Tanggal</th>
                                 <th>Jam Masuk</th>
@@ -113,25 +118,7 @@
     </div>
 
 
-    <!-- Required Js -->
-    <script src="{{ asset('assets/js/plugins/popper.min.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/simplebar.min.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('assets/js/fonts/custom-font.js') }}"></script>
-    <script src="{{ asset('assets/js/script.js') }}"></script>
-    <script src="{{ asset('assets/js/theme.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/feather.min.js') }}"></script>
-
-    <script>
-        layout_change('light');
-        font_change('Roboto');
-        change_box_container('false');
-        layout_caption_change('true');
-        layout_rtl_change('false');
-        preset_change('preset-1');
-    </script>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@push('scripts')
     <script>
         $(document).ready(function () {
             $('#searchInput').on('keyup', function () {
@@ -148,33 +135,98 @@
                 });
             });
         });
-        //popup presensi
+        // Data presensi global untuk filter
+        let currentAbsensiData = [];
+
+        function renderAbsensi(data) {
+            let rows = '';
+            if (data.length === 0) {
+                rows = `<tr><td colspan="4" class="text-center text-muted py-4">Data tidak ditemukan</td></tr>`;
+            } else {
+                data.forEach(function (item) {
+                    let badgeClass = 'bg-light-success text-success';
+                    if (item.status === 'Terlambat') badgeClass = 'bg-light-warning text-warning';
+                    if (item.status === 'Tidak Hadir' || item.status === 'Alpha') badgeClass = 'bg-light-danger text-danger';
+                    
+                    rows += `<tr>
+                        <td>${item.tanggal}</td>
+                        <td class="text-center">${item.jam_masuk ? item.jam_masuk.split(' ')[1] || item.jam_masuk : '-'}</td>
+                        <td class="text-center">${item.jam_keluar ? item.jam_keluar.split(' ')[1] || item.jam_keluar : '-'}</td>
+                        <td class="text-center"><span class="badge ${badgeClass}">${item.status ?? 'Hadir'}</span></td>
+                    </tr>`;
+                });
+            }
+            $('#absensiTable').html(rows);
+        }
+
+        function applyFilter() {
+            const type = $('#filterType').val();
+            const val = $('#filterValue').val();
+            
+            if (type === 'all' || !val) {
+                renderAbsensi(currentAbsensiData);
+                return;
+            }
+
+            let filtered = currentAbsensiData.filter(item => {
+                if (type === 'harian') return item.tanggal === val;
+                if (type === 'bulanan') return item.tanggal.startsWith(val);
+                if (type === 'tahunan') return item.tanggal.startsWith(val);
+                return true;
+            });
+
+            renderAbsensi(filtered);
+        }
+
+        // Event change filter
+        $('#filterType').on('change', function() {
+            const type = $(this).val();
+            const $container = $('#filterInputContainer');
+            const $action = $('#filterActionContainer');
+            const $input = $('#filterValue');
+            const $label = $('#filterInputLabel');
+
+            if (type === 'all') {
+                $container.hide();
+                $action.hide();
+                $input.val('');
+                renderAbsensi(currentAbsensiData);
+            } else {
+                $container.show();
+                $action.show();
+                if (type === 'harian') {
+                    $input.attr('type', 'date');
+                    $label.text('Pilih Tanggal');
+                } else if (type === 'bulanan') {
+                    $input.attr('type', 'month');
+                    $label.text('Pilih Bulan');
+                } else if (type === 'tahunan') {
+                    $input.attr('type', 'number').attr('min', '2020').attr('max', '2030');
+                    $input.val(new Date().getFullYear());
+                    $label.text('Ketik Tahun');
+                }
+            }
+        });
+
+        $('#filterValue').on('change keyup', applyFilter);
+        $('#btnResetFilter').on('click', function() {
+            $('#filterType').val('all').trigger('change');
+        });
+
+        // Popup presensi
         $(document).on('click', '.lihat-absensi', function (e) {
             e.preventDefault();
-
             let userId = $(this).data('id');
+            let name = $(this).text().trim();
+            $('#employeeName').text(name);
 
             $.ajax({
                 url: "/karyawan/" + userId + "/absensi",
                 type: "GET",
                 success: function (data) {
-                    let rows = '';
-
-                    if (data.length === 0) {
-                        rows = `<tr><td colspan="4" class="text-center">Belum ada data absensi</td></tr>`;
-                    } else {
-                        data.forEach(function (item) {
-                            rows += `<tr>
-                                                                    <td>${item.tanggal}</td>
-                                                                    <td>${item.jam_masuk ?? '-'}</td>
-                                                                    <td>${item.jam_keluar ?? '-'}</td>
-                                                                    <td>${item.status ?? '-'}</td>
-                                                                </tr>`;
-                        });
-                    }
-
-                    $('#absensiTable').html(rows);
-
+                    currentAbsensiData = data;
+                    $('#filterType').val('all').trigger('change');
+                    renderAbsensi(data);
                     var modal = new bootstrap.Modal(document.getElementById('absensiModal'));
                     modal.show();
                 },
@@ -184,4 +236,5 @@
             });
         });
     </script>
+@endpush
 @endsection

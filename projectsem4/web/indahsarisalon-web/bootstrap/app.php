@@ -12,10 +12,23 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->validateCsrfTokens(except: [
+            'booking/notification',
+        ]);
+
+        $middleware->web(append: [
+            \App\Http\Middleware\PreventBackHistory::class,
+        ]);
+
         $middleware->alias([
-        'session.timeout' => \App\Http\Middleware\SessionTimeout::class,
-    ]);
+            'session.timeout' => \App\Http\Middleware\SessionTimeout::class,
+            'prevent-back' => \App\Http\Middleware\PreventBackHistory::class,
+        ]);
+
+        $middleware->redirectGuestsTo(function () {
+            session()->flash('info', 'Silahkan login terlebih dahulu untuk melanjutkan.');
+            return route('auth');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
