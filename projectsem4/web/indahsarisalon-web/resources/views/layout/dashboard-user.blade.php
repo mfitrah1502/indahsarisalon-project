@@ -6,8 +6,65 @@
     <title>Dashboard | Indah Sarisalon</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <base href="{{ url('/') }}/">
+    <!-- [Favicon] icon -->
+    <link rel="icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/x-icon" />
+
     <!-- Styles -->
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+    <!-- [Google Font] Family -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+        id="main-font-link" />
+    <!-- [phosphor Icons] https://phosphoricons.com/ -->
+    <link rel="stylesheet" href="{{ asset('assets/fonts/phosphor/duotone/style.css') }}" />
+    <!-- [Tabler Icons] https://tablericons.com -->
+    <link rel="stylesheet" href="{{ asset('assets/fonts/tabler-icons.min.css') }}" />
+    <!-- [Feather Icons] https://feathericons.com -->
+    <link rel="stylesheet" href="{{ asset('assets/fonts/feather.css') }}" />
+    <!-- [Template CSS Files] -->
+    <link rel="stylesheet" href="{{ asset('assets/css/style-preset.css') }}" />
+    <style>
+        :root, [data-pc-preset=preset-1] {
+            --pc-sidebar-active-color: #EA8290 !important;
+            --bs-secondary: #EA8290 !important;
+            --bs-secondary-rgb: 234, 130, 144 !important;
+            --bs-secondary-light: #fce4e7 !important;
+        }
+        
+        /* Header & Icon Colors */
+        .pc-header {
+            z-index: 1050 !important; /* Ensure header is above content */
+        }
+        .pc-header .pc-head-link.head-link-secondary {
+            background: #fce4e7 !important;
+            color: #EA8290 !important;
+        }
+        .pc-header .pc-head-link.head-link-secondary:hover {
+            background: #EA8290 !important;
+            color: #fff !important;
+        }
+        
+        /* Ensure dropdown is visible */
+        .dropdown-user-profile.show {
+            display: block !important;
+            z-index: 9999 !important;
+        }
+        
+        /* Sidebar Active State icon/text */
+        .pc-sidebar .pc-item.active > .pc-link,
+        .pc-sidebar .pc-item:hover > .pc-link {
+            color: #EA8290 !important;
+        }
+        .pc-sidebar .pc-item.active > .pc-link .pc-micon i,
+        .pc-sidebar .pc-item.active > .pc-link .pc-micon svg {
+            color: #EA8290 !important;
+        }
+        
+        /* Secondary Backgrounds */
+        .bg-secondary-dark {
+            background: #D96A79 !important;
+        }
+    </style>
     <script>
         window.onpageshow = function(event) {
             if (event.persisted) {
@@ -34,33 +91,27 @@
     <!-- Footer -->
     @include('partials.footer')
 
-    <!-- Scripts -->
+    <!-- Required Js -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('assets/js/plugins/simplebar.min.js') }}"></script>
+    <script src="{{ asset('assets/js/fonts/custom-font.js') }}"></script>
     <script src="{{ asset('assets/js/script.js') }}"></script>
-    <!-- Initialize Hamburger Toggle -->
+    <script src="{{ asset('assets/js/theme.js') }}"></script>
+    <script src="{{ asset('assets/js/plugins/feather.min.js') }}"></script>
+
     <script>
-        function initSidebarToggle() {
-            const toggle = document.getElementById('mobile-collapse'); // tombol hamburger
-            const sidebar = document.querySelector('.pc-sidebar');
-
-            if (toggle && sidebar) {
-                // remove previous listener supaya tidak double
-                toggle.replaceWith(toggle.cloneNode(true));
-                const newToggle = document.getElementById('mobile-collapse');
-                newToggle.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    sidebar.classList.toggle('collapsed'); // toggle class collapsed
-                });
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme Config (Safe Check)
+            if (typeof layout_change === 'function') {
+                layout_change('light');
+                font_change('Roboto');
+                change_box_container('false');
+                layout_caption_change('true');
+                layout_rtl_change('false');
+                preset_change('preset-1');
             }
-
-            // Untuk menu level yang punya submenu
-            document.querySelectorAll('.pc-hasmenu > a').forEach(menu => {
-                menu.onclick = (e) => {
-                    e.preventDefault();
-                    menu.parentElement.classList.toggle('pc-open');
-                }
-            });
-        }
-
+        });
     </script>
 </body>
 

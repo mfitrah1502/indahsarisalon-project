@@ -1,16 +1,6 @@
 @extends('layout.dashboard')
 
 @section('title', 'Manajemen Pelanggan')
-<link rel="icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/x-icon" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-    id="main-font-link" />
-<link rel="stylesheet" href="{{ asset('assets/fonts/phosphor/duotone/style.css') }}" />
-<link rel="stylesheet" href="{{ asset('assets/fonts/tabler-icons.min.css') }}" />
-<link rel="stylesheet" href="{{ asset('assets/fonts/feather.css') }}" />
-<link rel="stylesheet" href="{{ asset('assets/fonts/fontawesome.css') }}" />
-<link rel="stylesheet" href="{{ asset('assets/fonts/material.css') }}" />
-<link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" id="main-style-link" />
-<link rel="stylesheet" href="{{ asset('assets/css/style-preset.css') }}" />
 <style>
     .popup-overlay {
         position: fixed;
@@ -123,30 +113,35 @@
         </div>
     </div>
 
-    <script src="{{ asset('assets/js/plugins/popper.min.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/simplebar.min.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('assets/js/fonts/custom-font.js') }}"></script>
-    <script src=" {{ asset('assets/js/script.js') }}"></script>
-    <script src="{{ asset('assets/js/theme.js') }}"></script>
-    <script src=" {{ asset('assets/js/plugins/feather.min.js') }}"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <script>
-        layout_change('light');
-        font_change('Roboto');
-        change_box_container('false');
-        layout_caption_change('true');
-        layout_rtl_change('false');
-        preset_change('preset-1');
+@push('scripts')
+<script>
+    $(document).ready(function () {
+        // Theme Config (Safe Check)
+        if (typeof layout_change === 'function') {
+            layout_change('light');
+            font_change('Roboto');
+            change_box_container('false');
+            layout_caption_change('true');
+            layout_rtl_change('false');
+            preset_change('preset-1');
+        }
 
-        // search AJAX
         $('#searchInput').on('keyup', function () {
             let query = $(this).val();
+
             $.ajax({
-                url: " {{ route('pelanggan.index') }}", type: "GET", data: { search: query }, success: function (data) { let tbody = $(data).find('tbody').html(); $('tbody').html(tbody); }
+                url: "{{ route('pelanggan.index') }}", 
+                type: 'GET',
+                data: { search: query },
+                success: function (data) {
+                    let tbody = $(data).find('tbody').html();
+                    $('tbody').html(tbody);
+                }
             });
-        }); // popup detail pelanggan
+        });
+
+        $(document).on('click', '.view-detail', function () {
             let row = $(this).closest('tr');
             $('#popupName').text(row.data('name')); 
             $('#popupUsername').text(row.data('username'));
@@ -154,8 +149,18 @@
             $('#popupPhone').text(row.data('phone') || '-');
             $('#popupStatus').text(row.data('status')); 
             $('#detailPopup').fadeIn();
-        }); $('.popup-close').click(function () { $('#detailPopup').fadeOut(); }); $('#detailPopup').click(function (e) {
-            if
-                (e.target.id === 'detailPopup') $(this).fadeOut();
-        }); </script>
+        });
+
+        $('.popup-close').click(function () {
+            $('#detailPopup').fadeOut();
+        });
+
+        $('#detailPopup').click(function (e) {
+            if (e.target.id === 'detailPopup') {
+                $(this).fadeOut();
+            }
+        });
+    });
+</script>
+@endpush
 @endsection

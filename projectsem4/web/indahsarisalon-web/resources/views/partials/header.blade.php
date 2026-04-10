@@ -22,8 +22,7 @@
                     <button class="pc-head-link head-link-primary dropdown-toggle arrow-none me-0 d-flex align-items-center border-0 bg-transparent" 
                        id="profile-dropdown-btn"
                        data-bs-toggle="dropdown" type="button" 
-                       aria-haspopup="false" aria-expanded="false" style="padding: 6px 15px; border-radius: 50px;"
-                       onclick="this.nextElementSibling.classList.toggle('show')">
+                       aria-haspopup="false" aria-expanded="false" style="padding: 6px 15px; border-radius: 50px;">
                         <img src="{{ Auth::user()->avatar_url }}"
                             alt="avatar" class="user-avtar" style="width: 35px; height: 35px; object-fit: cover; border-radius: 50%;" />
                         <span class="ms-2">
