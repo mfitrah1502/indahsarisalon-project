@@ -33,6 +33,38 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['avatar_url'];
+
+    /**
+     * Get the user's avatar URL.
+     *
+     * @return string
+     */
+    public function getAvatarUrlAttribute()
+    {
+        if ($this->avatar) {
+            if (filter_var($this->avatar, FILTER_VALIDATE_URL)) {
+                return $this->avatar;
+            }
+            
+            // Brute force: ambil elemen terakhir dari path (hanya nama filenya)
+            $parts = explode('/', $this->avatar);
+            $filename = end($parts);
+            
+            $baseUrl = config('services.supabase.url');
+            if (!$baseUrl) return asset('assets/images/user/avatar-2.jpg');
+
+            return rtrim($baseUrl, '/') . '/storage/v1/object/public/avatars/' . $filename;
+        }
+
+        return asset('assets/images/user/avatar-2.jpg');
+    }
+
+    /**
      * The attributes that should be hidden for serialization.
      *
      * @var list<string>

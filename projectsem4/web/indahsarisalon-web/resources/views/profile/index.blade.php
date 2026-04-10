@@ -87,7 +87,7 @@
                     <form id="formAvatar" enctype="multipart/form-data">
                         @csrf
                         <label for="avatarInput" class="profile-img-container rounded-circle mb-3 d-block" id="btnChangeAvatar">
-                            <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : '/assets/images/user/avatar-2.jpg' }}" 
+                            <img src="{{ Auth::user()->avatar_url }}" 
                                  class="rounded-circle shadow w-100 h-100" 
                                  id="profileImgPreview"
                                  style="object-fit: cover;"

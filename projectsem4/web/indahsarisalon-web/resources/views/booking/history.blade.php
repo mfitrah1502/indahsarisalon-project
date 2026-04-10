@@ -2,6 +2,10 @@
 
 @section('title', 'Riwayat Booking')
 
+@push('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+@endpush
+
 @section('content')
 <div class="row">
     <div class="col-12">
@@ -244,8 +248,7 @@
     </div>
 </div>
 
-<!-- Scripts -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     let activeBooking = null;
@@ -376,6 +379,7 @@
         $('#btnReset').on('click', () => { $mode.val('all').trigger('change'); });
     });
 </script>
+@endpush
 
 <style>
     .booking-card-user:hover {

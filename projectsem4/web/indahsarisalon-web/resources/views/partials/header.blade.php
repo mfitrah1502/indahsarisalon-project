@@ -12,29 +12,6 @@
                         <i class="ti ti-menu-2"></i>
                     </a>
                 </li>
-                <li class="dropdown pc-h-item d-inline-flex d-md-none">
-                    <a class="pc-head-link head-link-secondary dropdown-toggle arrow-none m-0" data-bs-toggle="dropdown"
-                        href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                        <i class="ti ti-search"></i>
-                    </a>
-                    <div class="dropdown-menu pc-h-dropdown drp-search">
-                        <form class="px-3">
-                            <div class="mb-0 d-flex align-items-center">
-                                <i data-feather="search"></i>
-                                <input type="search" class="form-control border-0 shadow-none"
-                                    placeholder="Search here. . ." />
-                            </div>
-                        </form>
-                    </div>
-                </li>
-                <li class="pc-h-item d-none d-md-inline-flex">
-                    <form class="header-search">
-                        <i data-feather="search" class="icon-search"></i>
-                        <input type="search" class="form-control" placeholder="Search here. . ." />
-                        <button class="btn btn-light-secondary btn-search"><i
-                                class="ti ti-adjustments-horizontal"></i></button>
-                    </form>
-                </li>
             </ul>
         </div>
         <!-- [Mobile Media Block end] -->
@@ -42,19 +19,22 @@
             <ul class="list-unstyled">
 
                 <li class="dropdown pc-h-item header-user-profile">
-                    <a class="pc-head-link head-link-primary dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown"
-                        href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                        <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : '/assets/images/user/avatar-2.jpg' }}"
-                            alt="user-image" class="user-avtar" />
-                        <span>
-                            <i class="ti ti-settings"></i>
+                    <button class="pc-head-link head-link-primary dropdown-toggle arrow-none me-0 d-flex align-items-center border-0 bg-transparent" 
+                       id="profile-dropdown-btn"
+                       data-bs-toggle="dropdown" type="button" 
+                       aria-haspopup="false" aria-expanded="false" style="padding: 6px 15px; border-radius: 50px;"
+                       onclick="this.nextElementSibling.classList.toggle('show')">
+                        <img src="{{ Auth::user()->avatar_url }}"
+                            alt="avatar" class="user-avtar" style="width: 35px; height: 35px; object-fit: cover; border-radius: 50%;" />
+                        <span class="ms-2">
+                            <i class="ti ti-settings fs-4"></i>
                         </span>
-                    </a>
-                    <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
+                    </button>
+                    <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown" id="profile-dropdown-menu">
                         <div class="dropdown-header">
                             <div class="d-flex align-items-center mb-3">
                                 <div class="flex-shrink-0">
-                                    <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : '/assets/images/user/avatar-2.jpg' }}"
+                                    <img src="{{ Auth::user()->avatar_url }}"
                                         alt="user-image" class="user-avtar rounded-circle" style="width: 45px; height: 45px; object-fit: cover;" />
                                 </div>
                                 <div class="flex-grow-1 ms-3">
