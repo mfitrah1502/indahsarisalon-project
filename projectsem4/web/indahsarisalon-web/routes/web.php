@@ -54,7 +54,7 @@ Route::post('/reset-password/otp', [PasswordResetController::class, 'resetPasswo
 // ------------------------------
 // Routes yang membutuhkan auth + session timeout
 // ------------------------------
-Route::middleware(['auth', 'session.timeout'])->group(function () {
+Route::middleware(['auth', 'session.timeout', 'prevent-back'])->group(function () {
     // ------------------------------
     // Profile
     // ------------------------------
@@ -145,7 +145,7 @@ Route::middleware(['auth', 'session.timeout'])->group(function () {
 // });
 // // Route baru untuk summary
 //     Route::post('/summary', [BookingController::class, 'summary'])->name('booking.summary');
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'prevent-back'])->group(function () {
     Route::get('/booking', [BookingController::class, 'index'])->name('booking.index'); // halaman daftar treatment
     Route::get('/booking/select/{treatmentId?}', [BookingController::class, 'select'])->name('booking.select'); // step 1
     Route::post('/booking/store', [BookingController::class, 'store'])->name('booking.store'); // simpan booking

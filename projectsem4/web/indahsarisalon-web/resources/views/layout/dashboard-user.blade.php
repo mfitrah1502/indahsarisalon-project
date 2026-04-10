@@ -8,6 +8,13 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+    <script>
+        window.onpageshow = function(event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        };
+    </script>
 </head>
 
 <body>

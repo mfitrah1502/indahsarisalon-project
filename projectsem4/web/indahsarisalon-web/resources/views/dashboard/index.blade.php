@@ -289,11 +289,14 @@
                     <i class="ti ti-settings"></i>
                     <span>Account Settings</span>
                   </a>
-                  <a href="../application/social-profile.html" class="dropdown-item">
+                  <a href="{{ route('profile') }}" class="dropdown-item">
                     <i class="ti ti-user"></i>
                     <span>Social Profile</span>
                   </a>
-                  <a href="../pages/login-v1.html" class="dropdown-item">
+                  <form id="logout-form-dashboard" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                  </form>
+                  <a href="#" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form-dashboard').submit();">
                     <i class="ti ti-logout"></i>
                     <span>Logout</span>
                   </a>

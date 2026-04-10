@@ -61,7 +61,10 @@
                                     <i class="ti ti-user"></i>
                                     <span>My Profile</span>
                                 </a>
-                                <a href="{{ route('auth') }}" class="dropdown-item">
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                    @csrf
+                                </form>
+                                <a href="#" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                     <i class="ti ti-logout"></i>
                                     <span>Logout</span>
                                 </a>

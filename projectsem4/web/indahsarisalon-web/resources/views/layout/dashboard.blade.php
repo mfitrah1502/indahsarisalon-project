@@ -10,6 +10,13 @@
     <!-- Styles -->
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     @stack('styles')
+    <script>
+        window.onpageshow = function(event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        };
+    </script>
 </head>
 
 <body>

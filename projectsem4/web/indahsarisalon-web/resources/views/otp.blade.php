@@ -83,7 +83,7 @@
                 @csrf
                 <div class="mb-3">
                     <label class="form-label small fw-bold">Email</label>
-                    <input type="email" name="email" class="form-control" placeholder="nama@email.com" required>
+                    <input type="email" name="email" class="form-control" placeholder="name@example.com" required>
                 </div>
                 <button type="submit" class="btn-custom py-2" id="btnSubmit">
                     <span class="btn-text">Kirim Kode OTP</span>
