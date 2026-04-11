@@ -15,10 +15,10 @@
 @section('content')
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h4>Edit Treatment</h4>
-                    <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-2 d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0 fw-bold text-dark">Edit Data Treatment</h4>
+                    <a href="{{ url()->previous() }}" class="btn btn-light rounded-pill px-4 btn-cancel">Kembali</a>
                 </div>
 
 
@@ -28,103 +28,151 @@
                         @csrf
                         @method('PUT')
 
-                        <div class="mb-3 text-center">
-                            @if($treatment->image)
-                                <img src="https://{{ env('SUPABASE_PROJECT_REF') }}.supabase.co/storage/v1/object/public/{{ env('SUPABASE_BUCKET') }}/{{ $treatment->image }}"
-                                    class="img-fluid mb-2" style="max-width: 200px; height: auto;
-                                                                            alt=" {{ $treatment->name }}">
-                            @else
-                                <img src="{{ asset('assets/images/no-image.jpg') }}" width="150" style="border-radius:10px;">
-                            @endif
-                        </div>
-                        <div class="mb-3">
-                            <label>Ganti Gambar</label>
-                            <input type="file" name="image" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label>Nama Treatment</label>
-                            <input type="text" name="name" class="form-control" value="{{ $treatment->name }}" required>
-                        </div>
-                        <label>Kategori</label>
-                        <select name="category_id" class="form-control">
-                            <option value="">Pilih Kategori</option>
-                            @foreach($categories as $cat)
-                                <option value="{{ $cat->id }}" {{ isset($treatment) && $treatment->category_id == $cat->id ? 'selected' : '' }}>
-                                    {{ $cat->name }}
-                                </option>
-                            @endforeach
-                        </select>
-
-                        <label>Atau Tambah Kategori Baru</label>
-                        <input type="text" name="category" class="form-control" placeholder="Masukkan kategori baru">
-
-                        <div class="mb-3">
-                            <label>Promo Treatment</label>
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="is_promo" name="is_promo" value="1" {{ $treatment->is_promo ? 'checked' : '' }}>
-                                <label class="form-check-label" for="is_promo">Aktifkan Promo</label>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted">Gambar Treatment Saat Ini</label>
+                            <div class="text-center mb-3">
+                                @if($treatment->image)
+                                    <img src="https://{{ env('SUPABASE_PROJECT_REF') }}.supabase.co/storage/v1/object/public/{{ env('SUPABASE_BUCKET') }}/{{ $treatment->image }}"
+                                        class="img-fluid rounded-4 shadow-sm" style="max-width: 250px; height: auto;" alt="{{ $treatment->name }}">
+                                @else
+                                    <img src="{{ asset('assets/images/no-image.jpg') }}" width="200" class="img-fluid rounded-4 shadow-sm">
+                                @endif
+                            </div>
+                            
+                            <label class="form-label fw-bold text-muted">Ganti Gambar (Opsional)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="ti ti-upload"></i></span>
+                                <input type="file" name="image" class="form-control bg-light border-0">
                             </div>
                         </div>
 
-                        <div class="mb-3" id="promo_fields" style="display: {{ $treatment->is_promo ? 'block' : 'none' }};">
-                            <label>Jenis Potongan</label>
-                            <select name="promo_type" class="form-control">
-                                <option value="percent" {{ $treatment->promo_type == 'percent' ? 'selected' : '' }}>Persen (%)
-                                </option>
-                                <option value="fixed" {{ $treatment->promo_type == 'fixed' ? 'selected' : '' }}>Nominal
-                                </option>
-                            </select>
-                            <label>Nilai Potongan</label>
-                            <input type="number" name="promo_value" class="form-control" placeholder="Masukkan potongan"
-                                value="{{ $treatment->promo_value }}">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted">Nama Treatment</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0"><i class="ti ti-按摩"></i></span>
+                                    <input type="text" name="name" class="form-control bg-light border-0" value="{{ $treatment->name }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted">Pilih Kategori</label>
+                                <select name="category_id" class="form-select bg-light border-0">
+                                    <option value="">-- Kategori Terdaftar --</option>
+                                    @foreach($categories as $cat)
+                                        <option value="{{ $cat->id }}" {{ isset($treatment) && $treatment->category_id == $cat->id ? 'selected' : '' }}>
+                                            {{ $cat->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
 
-                        <hr>
-                        <h5>Detail Treatment</h5>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted">Atau Tambah Kategori Baru</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="ti ti-plus"></i></span>
+                                <input type="text" name="category" class="form-control bg-light border-0" placeholder="Ketik nama kategori baru disini jika tidak ada di daftar atas">
+                            </div>
+                        </div>
+
+                        <div class="card bg-light-warning border-0 rounded-4 mb-4">
+                            <div class="card-body">
+                                <div class="form-check form-switch mb-3">
+                                    <input type="checkbox" class="form-check-input" id="is_promo" name="is_promo" value="1" {{ $treatment->is_promo ? 'checked' : '' }} style="transform: scale(1.2); margin-top: 4px;">
+                                    <label class="form-check-label ms-2 fw-bold text-warning-dark" for="is_promo">Aktifkan Promo Treatment</label>
+                                </div>
+
+                                <div class="row align-items-end" id="promo_fields" style="display: {{ $treatment->is_promo ? 'flex' : 'none' }};">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-muted">Jenis Potongan</label>
+                                        <select name="promo_type" class="form-select border-0">
+                                            <option value="percent" {{ $treatment->promo_type == 'percent' ? 'selected' : '' }}>Persen (%)</option>
+                                            <option value="fixed" {{ $treatment->promo_type == 'fixed' ? 'selected' : '' }}>Nominal (Rp)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-muted">Nilai Potongan</label>
+                                        <input type="number" name="promo_value" class="form-control border-0" placeholder="Contoh: 10 atau 50000" value="{{ $treatment->promo_value }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4 border-light-subtle">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0 fw-bold text-dark"><i class="ti ti-list text-primary me-2"></i>Detail Treatment & Harga</h5>
+                            <button type="button" id="add_detail" class="btn btn-light-primary rounded-pill px-3 shadow-none">
+                                <i class="ti ti-plus me-1"></i> Tambah Variasi
+                            </button>
+                        </div>
+
                         <div id="details_wrapper">
                             @foreach($treatment->details as $index => $detail)
-                                <div class="detail_item mb-3 p-3 border rounded">
-                                    <input type="text" name="details[{{ $index }}][name]" class="form-control mb-2"
-                                        placeholder="Nama Detail" value="{{ $detail->name }}" required>
-                                    <input type="number" name="details[{{ $index }}][duration]" class="form-control mb-2"
-                                        placeholder="Durasi (menit)" value="{{ $detail->duration }}" required>
-
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input stylist-price-toggle" 
-                                            name="details[{{ $index }}][has_stylist_price]" value="1" 
-                                            id="has_stylist_price_{{ $index }}" 
-                                            {{ $detail->has_stylist_price ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="has_stylist_price_{{ $index }}">Aktifkan Harga Khusus Stylist (Senior/Junior)</label>
-                                    </div>
-
-                                    <div class="normal-price-container" style="display: {{ $detail->has_stylist_price ? 'none' : 'block' }};">
-                                        <input type="number" name="details[{{ $index }}][price]" class="form-control mb-2 normal-price-input" 
-                                            placeholder="Harga" value="{{ $detail->price }}" {{ $detail->has_stylist_price ? '' : 'required' }}>
-                                    </div>
-
-                                    <div class="stylist-price-container" style="display: {{ $detail->has_stylist_price ? 'block' : 'none' }};">
-                                        <div class="row">
+                                <div class="detail_item card border-light-subtle rounded-4 mb-4 shadow-none fade-in">
+                                    <div class="card-body bg-light rounded-4">
+                                        <div class="row g-3">
                                             <div class="col-md-6">
-                                                <input type="number" name="details[{{ $index }}][price_senior]" class="form-control mb-2 stylist-price-input" 
-                                                    placeholder="Harga Senior" value="{{ $detail->price_senior }}" {{ $detail->has_stylist_price ? 'required' : '' }}>
+                                                <label class="form-label text-muted small fw-bold">Kategori/Nama Varian</label>
+                                                <input type="text" name="details[{{ $index }}][name]" class="form-control border-0" placeholder="Contoh: Rambut Pendek" value="{{ $detail->name }}" required>
                                             </div>
                                             <div class="col-md-6">
-                                                <input type="number" name="details[{{ $index }}][price_junior]" class="form-control mb-2 stylist-price-input" 
-                                                    placeholder="Harga Junior" value="{{ $detail->price_junior }}" {{ $detail->has_stylist_price ? 'required' : '' }}>
+                                                <label class="form-label text-muted small fw-bold">Durasi</label>
+                                                <div class="input-group shadow-none">
+                                                    <input type="number" name="details[{{ $index }}][duration]" class="form-control border-0" placeholder="Durasi" value="{{ $detail->duration }}" required>
+                                                    <span class="input-group-text bg-white border-0 text-muted">menit</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-12 mt-3">
+                                                <div class="form-check form-switch mb-3">
+                                                    <input type="checkbox" class="form-check-input stylist-price-toggle" name="details[{{ $index }}][has_stylist_price]" value="1" id="has_stylist_price_{{ $index }}" {{ $detail->has_stylist_price ? 'checked' : '' }}>
+                                                    <label class="form-check-label ms-2 text-primary fw-medium" for="has_stylist_price_{{ $index }}">Gunakan Harga Khusus Berdasarkan Stylist (Senior/Junior)</label>
+                                                </div>
+
+                                                <div class="normal-price-container" style="display: {{ $detail->has_stylist_price ? 'none' : 'block' }};">
+                                                    <div class="input-group shadow-none">
+                                                        <span class="input-group-text bg-white border-0 text-muted">Rp</span>
+                                                        <input type="number" name="details[{{ $index }}][price]" class="form-control border-0 normal-price-input" placeholder="Harga Standar" value="{{ $detail->price }}" {{ $detail->has_stylist_price ? '' : 'required' }}>
+                                                    </div>
+                                                </div>
+
+                                                <div class="stylist-price-container" style="display: {{ $detail->has_stylist_price ? 'block' : 'none' }};">
+                                                    <div class="row g-3">
+                                                        <div class="col-md-6">
+                                                            <div class="input-group shadow-none">
+                                                                <span class="input-group-text bg-white border-0 text-muted">Rp</span>
+                                                                <input type="number" name="details[{{ $index }}][price_senior]" class="form-control border-0 stylist-price-input" placeholder="Harga Khusus Stylist Senior" value="{{ $detail->price_senior }}" {{ $detail->has_stylist_price ? 'required' : '' }}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="input-group shadow-none">
+                                                                <span class="input-group-text bg-white border-0 text-muted">Rp</span>
+                                                                <input type="number" name="details[{{ $index }}][price_junior]" class="form-control border-0 stylist-price-input" placeholder="Harga Khusus Stylist Junior" value="{{ $detail->price_junior }}" {{ $detail->has_stylist_price ? 'required' : '' }}>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12 mt-3">
+                                                <label class="form-label text-muted small fw-bold">Keterangan Spesifik</label>
+                                                <textarea name="details[{{ $index }}][description]" class="form-control border-0" rows="2" placeholder="Catatan opsional...">{{ $detail->description }}</textarea>
                                             </div>
                                         </div>
+                                        <div class="text-end mt-3 border-top pt-3 border-light-subtle d-flex justify-content-end">
+                                            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 remove-detail">
+                                                <i class="ti ti-trash me-1"></i> Hapus Varian
+                                            </button>
+                                        </div>
                                     </div>
-
-                                    <textarea name="details[{{ $index }}][description]" class="form-control mb-2"
-                                        placeholder="Deskripsi">{{ $detail->description }}</textarea>
-
-                                    <button type="button" class="btn btn-danger btn-sm remove-detail mt-2">🗑 Hapus Detail</button>
                                 </div>
                             @endforeach
                         </div>
-                        <button type="button" id="add_detail" class="btn btn-secondary mb-3">Tambah Detail</button>
 
-                        <button type="submit" class="btn btn-primary">Update Treatment</button>
+                        <div class="d-flex justify-content-end gap-2 mt-5">
+                            <a href="{{ route('treatment.index') }}" class="btn btn-light rounded-pill px-4 btn-cancel">Batal</a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 shadow-sm"><i class="ti ti-device-floppy me-2"></i> Update Treatment</button>
+                        </div>
 
 
                     </form>
@@ -160,34 +208,63 @@
 
         let detail_index = {{ $treatment->details->count() }};
         $('#add_detail').click(function () {
-            let html = `<div class="detail_item mb-3 p-3 border rounded">
-                <input type="text" name="details[${detail_index}][name]" class="form-control mb-2" placeholder="Nama Detail" required>
-                <input type="number" name="details[${detail_index}][duration]" class="form-control mb-2" placeholder="Durasi (menit)" required>
-                
-                <div class="form-check mb-2">
-                    <input type="checkbox" class="form-check-input stylist-price-toggle" 
-                        name="details[${detail_index}][has_stylist_price]" value="1" id="has_stylist_price_${detail_index}">
-                    <label class="form-check-label" for="has_stylist_price_${detail_index}">Aktifkan Harga Khusus Stylist (Senior/Junior)</label>
-                </div>
-
-                <div class="normal-price-container">
-                    <input type="number" name="details[${detail_index}][price]" class="form-control mb-2 normal-price-input" placeholder="Harga" required>
-                </div>
-
-                <div class="stylist-price-container" style="display: none;">
-                    <div class="row">
+            let html = `<div class="detail_item card border-light-subtle rounded-4 mb-4 shadow-none fade-in">
+                <div class="card-body bg-light rounded-4">
+                    <div class="row g-3">
                         <div class="col-md-6">
-                            <input type="number" name="details[${detail_index}][price_senior]" class="form-control mb-2 stylist-price-input" placeholder="Harga Senior">
+                            <label class="form-label text-muted small fw-bold">Kategori/Nama Varian</label>
+                            <input type="text" name="details[${detail_index}][name]" class="form-control border-0" placeholder="Contoh: Rambut Pendek" required>
                         </div>
                         <div class="col-md-6">
-                            <input type="number" name="details[${detail_index}][price_junior]" class="form-control mb-2 stylist-price-input" placeholder="Harga Junior">
+                            <label class="form-label text-muted small fw-bold">Durasi</label>
+                            <div class="input-group shadow-none">
+                                <input type="number" name="details[${detail_index}][duration]" class="form-control border-0" placeholder="Durasi" required>
+                                <span class="input-group-text bg-white border-0 text-muted">menit</span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mt-3">
+                            <div class="form-check form-switch mb-3">
+                                <input type="checkbox" class="form-check-input stylist-price-toggle" name="details[${detail_index}][has_stylist_price]" value="1" id="has_stylist_price_${detail_index}">
+                                <label class="form-check-label ms-2 text-primary fw-medium" for="has_stylist_price_${detail_index}">Gunakan Harga Khusus Berdasarkan Stylist (Senior/Junior)</label>
+                            </div>
+
+                            <div class="normal-price-container">
+                                <div class="input-group shadow-none">
+                                    <span class="input-group-text bg-white border-0 text-muted">Rp</span>
+                                    <input type="number" name="details[${detail_index}][price]" class="form-control border-0 normal-price-input" placeholder="Harga Standar" required>
+                                </div>
+                            </div>
+
+                            <div class="stylist-price-container" style="display: none;">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="input-group shadow-none">
+                                            <span class="input-group-text bg-white border-0 text-muted">Rp</span>
+                                            <input type="number" name="details[${detail_index}][price_senior]" class="form-control border-0 stylist-price-input" placeholder="Harga Khusus Stylist Senior">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-group shadow-none">
+                                            <span class="input-group-text bg-white border-0 text-muted">Rp</span>
+                                            <input type="number" name="details[${detail_index}][price_junior]" class="form-control border-0 stylist-price-input" placeholder="Harga Khusus Stylist Junior">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 mt-3">
+                            <label class="form-label text-muted small fw-bold">Keterangan Spesifik</label>
+                            <textarea name="details[${detail_index}][description]" class="form-control border-0" rows="2" placeholder="Catatan opsional..."></textarea>
                         </div>
                     </div>
+                    <div class="text-end mt-3 border-top pt-3 border-light-subtle d-flex justify-content-end">
+                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 remove-detail">
+                            <i class="ti ti-trash me-1"></i> Hapus Varian
+                        </button>
+                    </div>
                 </div>
-
-                <textarea name="details[${detail_index}][description]" class="form-control mb-2" placeholder="Deskripsi"></textarea>
-                
-                <button type="button" class="btn btn-danger btn-sm remove-detail mt-2">🗑 Hapus Detail</button>
             </div>`;
             $('#details_wrapper').append(html);
             detail_index++;
@@ -216,6 +293,57 @@
                 container.find('.normal-price-input').prop('required', true);
                 container.find('.stylist-price-container').hide();
                 container.find('.stylist-price-input').removeAttr('required').val('');
+            }
+        });
+
+        // Cek perubahan data
+        let isSubmitting = false;
+        let initialData = $('form').serialize();
+
+        $('form').on('submit', function() {
+            isSubmitting = true;
+        });
+
+        function isFormModified() {
+            let modified = $('form').serialize() !== initialData;
+            $('input[type="file"]').each(function() {
+                if (this.files.length > 0) modified = true;
+            });
+            return modified;
+        }
+
+        // Konfirmasi Batal
+        $(document).on('click', '.btn-cancel', function(e) {
+            e.preventDefault();
+            let url = $(this).attr('href');
+            
+            if (isFormModified()) {
+                Swal.fire({
+                    title: 'Batalkan perubahan?',
+                    text: "Setiap perubahan yang baru Anda buat tidak akan tersimpan.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, batalkan!',
+                    cancelButtonText: 'Kembali edit'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        isSubmitting = true;
+                        window.location.href = url;
+                    }
+                });
+            } else {
+                isSubmitting = true;
+                window.location.href = url;
+            }
+        });
+
+        // Konfirmasi saat back di browser web
+        window.addEventListener('beforeunload', function (e) {
+            if (!isSubmitting && isFormModified()) {
+                e.preventDefault();
+                e.returnValue = ''; 
             }
         });
     </script>
