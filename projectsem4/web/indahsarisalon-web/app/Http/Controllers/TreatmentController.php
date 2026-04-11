@@ -53,6 +53,8 @@ class TreatmentController extends Controller
 
         // Jika kategori disimpan sebagai array di controller
         $categories = Category::all(); // Ambil semua kategori untuk filter dropdown
+        $trashedTreatments = Treatment::onlyTrashed()->with('category')->get();
+
         $treatments->transform(function($treatment) {
     $treatment->details_for_modal = $treatment->details->map(function($d){
         return [
@@ -65,7 +67,7 @@ class TreatmentController extends Controller
     return $treatment;
 });
 
-        return view('treatment.index', compact('treatments', 'categories'));
+        return view('treatment.index', compact('treatments', 'categories', 'trashedTreatments'));
     }
 
     // Menampilkan form tambah treatment
