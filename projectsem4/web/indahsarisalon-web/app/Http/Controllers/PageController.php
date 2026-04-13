@@ -58,12 +58,6 @@ class PageController extends Controller
         return view('dashboard.homepage-user', compact('latestBooking', 'categories'));
     }
 
-    public function landing()
-    
-    {
-        return view('landing'); // file: resources/views/landing.blade.php
-    }
-
     public function about()
     {
         return view('about'); // file: resources/views/about.blade.php

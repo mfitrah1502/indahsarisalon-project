@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'manage_services_page.dart';
-import 'home_page.dart';
-import 'booking_list_page.dart';
-import 'report_page.dart';
-import 'settings_page.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -14,99 +9,19 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
+  int _selectedIndex = 0; // Same as home for demonstration
   final Color darkBlue = const Color(0xFF02365A);
   final Color scaffoldBg = const Color(0xFFF6F8FA);
   final Color mutedText = const Color(0xFF64748B);
 
-  bool isLoading = true;
-  List<Map<String, dynamic>> todayNotifications = [];
-  List<Map<String, dynamic>> earlierNotifications = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchNotifications();
-  }
-
-  Future<void> _fetchNotifications() async {
-    final supabase = Supabase.instance.client;
-
-    try {
-      final List data = await supabase
-          .from('notifikasi')
-          .select()
-          .order('created_at', ascending: false);
-
-      final now = DateTime.now();
-      List<Map<String, dynamic>> today = [];
-      List<Map<String, dynamic>> earlier = [];
-
-      for (var row in data) {
-        final date = DateTime.parse(row['created_at']).toLocal();
-        if (date.year == now.year && date.month == now.month && date.day == now.day) {
-          today.add(row as Map<String, dynamic>);
-        } else {
-          earlier.add(row as Map<String, dynamic>);
-        }
-      }
-
-      if (mounted) {
-        setState(() {
-          todayNotifications = today;
-          earlierNotifications = earlier;
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      debugPrint("Error loading notifications: $e");
-      if (mounted) {
-        setState(() => isLoading = false);
-      }
-    }
-  }
-
-  Future<void> markAllAsRead() async {
-    final supabase = Supabase.instance.client;
-    try {
-      await supabase.from('notifikasi').update({'is_read': true}).neq('is_read', true);
-      _fetchNotifications();
-    } catch (e) {
-      debugPrint("Error updating notifications: $e");
-    }
-  }
-
-  String _getTimeAgo(DateTime date) {
-    final diff = DateTime.now().difference(date);
-    if (diff.inMinutes < 60) {
-      return "${diff.inMinutes} mins ago";
-    } else if (diff.inHours < 24) {
-      return "${diff.inHours} hours ago";
-    } else {
-      return "${diff.inDays} days ago";
-    }
-  }
-
-  IconData _getIconForTitle(String title) {
-    final t = title.toLowerCase();
-    if (t.contains("booking")) return Icons.calendar_today_outlined;
-    if (t.contains("promo")) return Icons.local_offer_outlined;
-    if (t.contains("payment")) return Icons.payments_outlined;
-    if (t.contains("reminder")) return Icons.alarm_rounded;
-    return Icons.info_outline;
-  }
-
   @override
   Widget build(BuildContext context) {
-    int unreadCount = 0;
-    for (var n in todayNotifications) { if (n['is_read'] == false) unreadCount++; }
-    for (var n in earlierNotifications) { if (n['is_read'] == false) unreadCount++; }
-
     return Scaffold(
       backgroundColor: scaffoldBg,
       body: SafeArea(
         child: Column(
           children: [
-            // Header
+            // AppBar / Header
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 24.0,
@@ -133,32 +48,31 @@ class _NotificationsPageState extends State<NotificationsPage> {
               ),
             ),
 
-            // Subheader
+            // Subheader (Updates & Mark Read)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    unreadCount > 0 ? "You have $unreadCount new updates" : "No new updates",
-                    style: const TextStyle(
-                      color: Color(0xFF4B5563),
+                    "You have 4 new updates",
+                    style: TextStyle(
+                      color: const Color(0xFF4B5563),
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  if (unreadCount > 0)
-                    GestureDetector(
-                      onTap: markAllAsRead,
-                      child: Text(
-                        "Mark all as read",
-                        style: TextStyle(
-                          color: darkBlue,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
+                  GestureDetector(
+                    onTap: () {},
+                    child: Text(
+                      "Mark all as read",
+                      style: TextStyle(
+                        color: darkBlue,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
+                  ),
                 ],
               ),
             ),
@@ -167,78 +81,90 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
             // Notifications List
             Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (todayNotifications.isNotEmpty) ...[
-                            const Text(
-                              "TODAY",
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.2,
-                                color: Color(0xFF4B5563),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            for (var notif in todayNotifications) ...[
-                              _buildNotificationCard(
-                                title: notif['title'],
-                                timeText: _getTimeAgo(DateTime.parse(notif['created_at']).toLocal()),
-                                description: notif['message'],
-                                iconData: _getIconForTitle(notif['title']),
-                                iconBgColor: const Color(0xFFE4F0F9),
-                                iconColor: darkBlue,
-                                isUnread: notif['is_read'] == false,
-                                showButton: notif['title'].toString().toLowerCase().contains('booking'),
-                              ),
-                              const SizedBox(height: 16),
-                            ],
-                          ],
-
-                          if (earlierNotifications.isNotEmpty) ...[
-                            const SizedBox(height: 16),
-                            const Text(
-                              "EARLIER",
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.2,
-                                color: Color(0xFF4B5563),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            for (var notif in earlierNotifications) ...[
-                              _buildNotificationCard(
-                                title: notif['title'],
-                                timeText: _getTimeAgo(DateTime.parse(notif['created_at']).toLocal()),
-                                description: notif['message'],
-                                iconData: _getIconForTitle(notif['title']),
-                                iconBgColor: const Color(0xFFDEE3E8),
-                                iconColor: const Color(0xFF5A6A7D),
-                                isUnread: notif['is_read'] == false,
-                                showButton: false,
-                              ),
-                              const SizedBox(height: 16),
-                            ],
-                          ],
-
-                          if (todayNotifications.isEmpty && earlierNotifications.isEmpty)
-                            Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(32.0),
-                                child: Text("No notifications yet.", style: TextStyle(color: mutedText)),
-                              ),
-                            ),
-
-                          const SizedBox(height: 32),
-                        ],
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // TODAY Section
+                    Text(
+                      "TODAY",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
+                        color: const Color(0xFF4B5563),
                       ),
                     ),
+                    const SizedBox(height: 16),
+
+                    _buildNotificationCard(
+                      title: "New Booking",
+                      timeText: "10 mins ago",
+                      description: "Indah Glow Facial at 2:00 PM today.",
+                      iconData: Icons.calendar_today_outlined,
+                      iconBgColor: const Color(0xFFE4F0F9),
+                      iconColor: darkBlue,
+                      isUnread: true,
+                      showButton: true,
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildNotificationCard(
+                      title: "Payment Received",
+                      timeText: "2 hours ago",
+                      description: "\$85 from Jane Doe for Hair Styling.",
+                      iconData: Icons.payments_outlined,
+                      iconBgColor: const Color(0xFFFBE6D3),
+                      iconColor: const Color(0xFF7A4A1E),
+                      isUnread: true,
+                      showButton: false,
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // EARLIER Section
+                    Text(
+                      "EARLIER",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
+                        color: const Color(0xFF4B5563),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildNotificationCard(
+                      title: "System Update",
+                      timeText: "1 day ago",
+                      description:
+                          "New analytics features are now available in your Report tab.",
+                      iconData: Icons.info_outline,
+                      iconBgColor: const Color(
+                        0xFFD6E4F0,
+                      ), // slightly different grey/blue
+                      iconColor: const Color(0xFF5A6A7D),
+                      isUnread: false,
+                      showButton: false,
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildNotificationCard(
+                      title: "New Customer",
+                      timeText: "2 days ago",
+                      description: "Mark Smith just registered an account.",
+                      iconData: Icons.person_outline,
+                      iconBgColor: const Color(0xFFDEE3E8),
+                      iconColor: const Color(0xFF5A6A7D),
+                      isUnread: false,
+                      showButton: false,
+                    ),
+
+                    const SizedBox(height: 32), // bottom padding
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -285,7 +211,11 @@ class _NotificationsPageState extends State<NotificationsPage> {
     required bool isUnread,
     required bool showButton,
   }) {
-    Color cardBg = isUnread ? Colors.white : const Color(0xFFF1F4F8);
+    // If it's unread, we usually have a white background with shadow.
+    // If read, a slightly transparent/flat view.
+    Color cardBg = isUnread
+        ? Colors.white
+        : const Color(0xFFF1F4F8); // F1F4F8 matches 'earlier' card style
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -300,11 +230,12 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   offset: const Offset(0, 4),
                 ),
               ]
-            : null,
+            : null, // Read items don't have shadow in the image
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Icon Box
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -314,28 +245,31 @@ class _NotificationsPageState extends State<NotificationsPage> {
             child: Icon(iconData, color: iconColor, size: 28),
           ),
           const SizedBox(width: 16),
+
+          // Content
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Title & Time Area
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1F2937),
+                        color: const Color(0xFF1F2937),
                       ),
                     ),
                     Row(
                       children: [
                         Text(
                           timeText,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: Color(0xFF6B7280),
+                            color: const Color(0xFF6B7280),
                           ),
                         ),
                         if (isUnread) ...[
@@ -353,15 +287,20 @@ class _NotificationsPageState extends State<NotificationsPage> {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 8),
+
+                // Description
                 Text(
                   description,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
-                    color: Color(0xFF4B5563),
+                    color: const Color(0xFF4B5563),
                     height: 1.4,
                   ),
                 ),
+
+                // Optional Action Button
                 if (showButton) ...[
                   const SizedBox(height: 12),
                   SizedBox(
@@ -396,55 +335,28 @@ class _NotificationsPageState extends State<NotificationsPage> {
   }
 
   Widget _buildNavItem(int index, String label, IconData icon) {
+    // For demo, we leave 0 as selected if you just want to mimic the image.
+    // However, the image doesn't actually have an active state in this screenshot. Let's make none active or unread the home.
+    final isSelected =
+        false; // The notifications page screenshot shows none of them explicitly active unless they tap it.
+
     return GestureDetector(
       onTap: () {
-        if (index == 0) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const HomePage()),
-            (route) => false,
-          );
-        } else if (index == 1) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const BookingListPage()),
-            (route) => false,
-          );
-        } else if (index == 2) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const ManageServicesPage()),
-            (route) => false,
-          );
-        } else if (index == 3) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const ReportPage()),
-            (route) => false,
-          );
-        } else if (index == 4) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const SettingsPage()),
-            (route) => false,
-          );
-        }
+        setState(() {
+          _selectedIndex = index;
+        });
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            color: mutedText,
-            size: 26,
-          ),
+          Icon(icon, color: isSelected ? darkBlue : mutedText, size: 26),
           const SizedBox(height: 6),
           Text(
             label,
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w800,
-              color: mutedText,
+              color: isSelected ? darkBlue : mutedText,
               letterSpacing: 0.5,
             ),
           ),

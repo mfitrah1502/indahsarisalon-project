@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:intl/intl.dart';
 import 'notifications_page.dart';
 import 'booking_page.dart';
 import 'settings_page.dart';
 import 'booking_list_page.dart';
 import 'manage_services_page.dart';
-import 'report_page.dart';
+import 'manage_services_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,119 +19,8 @@ class _HomePageState extends State<HomePage> {
   final Color scaffoldBg = const Color(0xFFF6F8FA);
   final Color mutedText = const Color(0xFF64748B);
 
-  // States
-  bool isLoading = true;
-  int todayBookings = 0;
-  int todayRevenue = 0;
-  int todayCustomers = 0;
-
-  num bookingsIncrease = 0;
-  num revenueIncrease = 0;
-  num customersIncrease = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchDashboardData();
-  }
-
-  Future<void> _fetchDashboardData() async {
-    final supabase = Supabase.instance.client;
-
-    try {
-      final now = DateTime.now();
-      // Today bounds
-      final todayStart = DateTime(now.year, now.month, now.day).toIso8601String();
-      final todayEnd = DateTime(now.year, now.month, now.day, 23, 59, 59).toIso8601String();
-      
-      // Yesterday bounds
-      final yesterdayStart = DateTime(now.year, now.month, now.day - 1).toIso8601String();
-      final yesterdayEnd = DateTime(now.year, now.month, now.day - 1, 23, 59, 59).toIso8601String();
-
-      // Fetch Today's bookings
-      final todayData = await supabase
-          .from('bookings')
-          .select('id, user_id, total_price, reservation_datetime')
-          .gte('reservation_datetime', todayStart)
-          .lte('reservation_datetime', todayEnd);
-
-      // Fetch Yesterday's bookings
-      final yesterdayData = await supabase
-          .from('bookings')
-          .select('id, user_id, total_price, reservation_datetime')
-          .gte('reservation_datetime', yesterdayStart)
-          .lte('reservation_datetime', yesterdayEnd);
-
-      // Calculate Today Stats
-      int tBookings = todayData.length;
-      int tRev = 0;
-      Set<int> tCustomers = {};
-      for (var b in todayData) {
-        tRev += (b['total_price'] as num?)?.toInt() ?? 0;
-        final uId = (b['user_id'] as num?)?.toInt();
-        if (uId != null) tCustomers.add(uId);
-      }
-
-      // Calculate Yesterday Stats
-      int yBookings = yesterdayData.length;
-      int yRev = 0;
-      Set<int> yCustomers = {};
-      for (var b in yesterdayData) {
-        yRev += (b['total_price'] as num?)?.toInt() ?? 0;
-        final uId = (b['user_id'] as num?)?.toInt();
-        if (uId != null) yCustomers.add(uId);
-      }
-
-      // Calculate percentage increase
-      double bInc = yBookings == 0 ? (tBookings > 0 ? 100 : 0) : ((tBookings - yBookings) / yBookings) * 100;
-      double rInc = yRev == 0 ? (tRev > 0 ? 100 : 0) : ((tRev - yRev) / yRev) * 100;
-      double cInc = yCustomers.isEmpty ? (tCustomers.isNotEmpty ? 100 : 0) : ((tCustomers.length - yCustomers.length) / yCustomers.length) * 100;
-
-      if (mounted) {
-        setState(() {
-          todayBookings = tBookings;
-          todayRevenue = tRev;
-          todayCustomers = tCustomers.length;
-          
-          bookingsIncrease = bInc;
-          revenueIncrease = rInc;
-          customersIncrease = cInc;
-          
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      debugPrint("Error fetching dashboard data: $e");
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    }
-  }
-
-  String formatCurrency(int amount) {
-    return NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(amount);
-  }
-
-  String formatIncrease(num percentage) {
-    if (percentage > 0) return "+${percentage.toStringAsFixed(1)}% vs yesterday";
-    if (percentage < 0) return "${percentage.toStringAsFixed(1)}% vs yesterday";
-    return "Same as yesterday";
-  }
-
-  void _navigateToReport() {
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const ReportPage()),
-      (route) => false,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final todayFormatted = DateFormat('MMMM d').format(DateTime.now()).toUpperCase();
-
     return Scaffold(
       backgroundColor: scaffoldBg,
       body: SafeArea(
@@ -165,7 +52,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         const SizedBox(width: 16),
                         Text(
-                          "Hello, Admin!",
+                          "Hello, username!",
                           style: TextStyle(
                             color: darkBlue,
                             fontSize: 20,
@@ -230,12 +117,12 @@ class _HomePageState extends State<HomePage> {
 
                 // Title Section
                 Text(
-                  "TODAY, $todayFormatted",
+                  "TODAY, OCTOBER 24",
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.2,
-                    color: const Color(0xFF4B5563),
+                    color: Color(0xFF4B5563),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -251,46 +138,27 @@ class _HomePageState extends State<HomePage> {
 
                 const SizedBox(height: 24),
 
-                if (isLoading)
-                  const Center(child: CircularProgressIndicator())
-                else ...[
-                  // Stat Cards
-                  GestureDetector(
-                    onTap: _navigateToReport,
-                    child: _buildStatCard(
-                      title: "TOTAL BOOKINGS TODAY",
-                      value: "$todayBookings",
-                      increase: formatIncrease(bookingsIncrease),
-                      iconData: Icons.calendar_today_rounded,
-                      increaseColor: bookingsIncrease >= 0 ? darkBlue : Colors.red,
-                      trendIcon: bookingsIncrease >= 0 ? Icons.trending_up : Icons.trending_down,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  GestureDetector(
-                    onTap: _navigateToReport,
-                    child: _buildStatCard(
-                      title: "TODAY'S REVENUE",
-                      value: formatCurrency(todayRevenue),
-                      increase: formatIncrease(revenueIncrease),
-                      iconData: Icons.payments_outlined,
-                      increaseColor: revenueIncrease >= 0 ? darkBlue : Colors.red,
-                      trendIcon: revenueIncrease >= 0 ? Icons.trending_up : Icons.trending_down,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  GestureDetector(
-                    onTap: _navigateToReport,
-                    child: _buildStatCard(
-                      title: "NUMBER OF CUSTOMERS",
-                      value: "$todayCustomers",
-                      increase: formatIncrease(customersIncrease),
-                      iconData: Icons.people_outline_rounded,
-                      increaseColor: customersIncrease >= 0 ? darkBlue : Colors.red,
-                      trendIcon: customersIncrease >= 0 ? Icons.trending_up : Icons.trending_down,
-                    ),
-                  ),
-                ],
+                // Stat Cards
+                _buildStatCard(
+                  title: "TOTAL BOOKINGS TODAY",
+                  value: "12",
+                  increase: "15% vs yesterday",
+                  iconData: Icons.calendar_today_rounded,
+                ),
+                const SizedBox(height: 16),
+                _buildStatCard(
+                  title: "TODAY'S REVENUE",
+                  value: "\$850",
+                  increase: "8% vs yesterday",
+                  iconData: Icons.payments_outlined,
+                ),
+                const SizedBox(height: 16),
+                _buildStatCard(
+                  title: "NUMBER OF CUSTOMERS",
+                  value: "8",
+                  increase: "2% vs yesterday",
+                  iconData: Icons.people_outline_rounded,
+                ),
                 const SizedBox(height: 100), // padding for bottom nav
               ],
             ),
@@ -335,8 +203,6 @@ class _HomePageState extends State<HomePage> {
     required String value,
     required String increase,
     required IconData iconData,
-    required Color increaseColor,
-    required IconData trendIcon,
   }) {
     return Container(
       padding: const EdgeInsets.all(24),
@@ -355,46 +221,44 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
-                    color: Color(0xFF4B5563),
-                  ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                  color: const Color(0xFF4B5563),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 32, // slightly smaller to fit Rp
-                    fontWeight: FontWeight.w900,
-                    color: darkBlue,
-                    height: 1.1,
-                  ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 42,
+                  fontWeight: FontWeight.w900,
+                  color: darkBlue,
+                  height: 1.1,
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Icon(trendIcon, color: increaseColor, size: 16),
-                    const SizedBox(width: 4),
-                    Text(
-                      increase,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: increaseColor,
-                      ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Icon(Icons.trending_up, color: darkBlue, size: 16),
+                  const SizedBox(width: 4),
+                  Text(
+                    increase,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: darkBlue,
                     ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           ),
           Icon(
             iconData,
@@ -416,22 +280,16 @@ class _HomePageState extends State<HomePage> {
             MaterialPageRoute(builder: (context) => const BookingListPage()),
             (route) => false,
           );
-        } else if (index == 2) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const ManageServicesPage()),
-            (route) => false,
-          );
-        } else if (index == 3) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const ReportPage()),
-            (route) => false,
-          );
         } else if (index == 4) {
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const SettingsPage()),
+            (route) => false,
+          );
+        } else if (index == 2) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const ManageServicesPage()),
             (route) => false,
           );
         } else {

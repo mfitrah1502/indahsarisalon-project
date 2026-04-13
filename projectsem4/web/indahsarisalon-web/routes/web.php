@@ -16,7 +16,7 @@ use App\Http\Controllers\CategoryController;
 // ------------------------------
 // Home & Landing
 // ------------------------------
-Route::get('/', [PageController::class, 'landing'])->name('landing');
+Route::get('/home', fn() => view('home'));
 
 // ------------------------------
 // Form login & register
