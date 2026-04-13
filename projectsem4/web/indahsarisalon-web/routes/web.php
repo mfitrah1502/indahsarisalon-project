@@ -157,7 +157,6 @@ Route::middleware(['auth', 'prevent-back'])->group(function () {
     Route::post('/booking/pay/{bookingId}', [BookingController::class, 'pay'])->name('booking.pay'); // bayar
     Route::get('/booking/history', [BookingController::class, 'history'])->name('booking.history'); // riwayat
     Route::post('/booking/{id}/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
-    Route::get('/booking/verify/{id}', [BookingController::class, 'verify'])->name('booking.verify');
     Route::post('/booking/notification', [BookingController::class, 'handleNotification'])->name('booking.notification'); // webhook
 });
 });
