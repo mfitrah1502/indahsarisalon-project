@@ -131,10 +131,6 @@ Route::middleware(['auth', 'session.timeout', 'prevent-back'])->group(function (
 
         // Pelanggan
         Route::resource('pelanggan', PelangganController::class);
-
-        // Keranjang Sampah (Integrated in modules)
-        Route::post('/sampah/restore/{type}/{id}', [\App\Http\Controllers\TrashController::class, 'restore'])->name('sampah.restore');
-        Route::delete('/sampah/force-delete/{type}/{id}', [\App\Http\Controllers\TrashController::class, 'forceDelete'])->name('sampah.forceDelete');
     });
     
     //Booking

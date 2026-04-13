@@ -21,9 +21,8 @@ class PelangganController extends Controller
         }
 
         $pelanggans = $query->get();
-        $trashedPelanggans = User::onlyTrashed()->where('role', 'pelanggan')->get();
 
-        return view('pelanggan.index', compact('pelanggans', 'trashedPelanggans'));
+        return view('pelanggan.index', compact('pelanggans'));
     }
     public function create()
     {

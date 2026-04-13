@@ -25,9 +25,8 @@ class KaryawanController extends Controller
         }
 
         $karyawans = $query->get();
-        $trashedKaryawans = User::onlyTrashed()->whereIn('role', ['admin', 'karyawan'])->get();
 
-        return view('karyawan.index', compact('karyawans', 'trashedKaryawans'));
+        return view('karyawan.index', compact('karyawans'));
     }
 
     public function create()

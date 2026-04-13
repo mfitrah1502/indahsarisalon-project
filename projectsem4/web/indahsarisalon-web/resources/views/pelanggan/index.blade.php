@@ -37,12 +37,10 @@
 @section('content')
     <div class="row">
         <div class="col-12">
-            <div class="card shadow-sm border-0 rounded-4">
-                <div class="card-header bg-white border-bottom-0 pt-4 pb-2 d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0 fw-bold text-dark">Daftar Pelanggan</h4>
-                    <a href="{{ route('pelanggan.create') }}" class="btn btn-primary rounded-pill px-4 shadow-sm">
-                        <i class="ti ti-plus me-1"></i> Tambah Pelanggan
-                    </a>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>Daftar Pelanggan</h4>
+                    <a href="{{ route('pelanggan.create') }}" class="btn btn-primary">Tambah Pelanggan</a>
                 </div>
 
                 @if(session('success'))
@@ -51,82 +49,44 @@
                 @endif
 
                 <div class="card-body">
-                    <ul class="nav nav-tabs mb-4" id="pelangganTab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="aktif-tab" data-bs-toggle="tab" data-bs-target="#aktif" type="button" role="tab" aria-controls="aktif" aria-selected="true">
-                                <i class="ti ti-users me-2"></i>Daftar Aktif
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="trash-tab" data-bs-toggle="tab" data-bs-target="#trash" type="button" role="tab" aria-controls="trash" aria-selected="false">
-                                <i class="ti ti-trash me-2"></i>Keranjang Sampah 
-                                @if($trashedPelanggans->count() > 0)
-                                    <span class="badge bg-danger ms-2">{{ $trashedPelanggans->count() }}</span>
-                                @endif
-                            </button>
-                        </li>
-                    </ul>
+                    <div class="mb-3">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Cari pelanggan..."
+                            value="{{ request('search') }}">
+                    </div>
 
-                    <div class="tab-content" id="pelangganTabContent">
-                        <!-- TAB AKTIF -->
-                        <div class="tab-pane fade show active" id="aktif" role="tabpanel" aria-labelledby="aktif-tab">
-                            <div class="d-flex mb-4">
-                                <div class="input-group" style="max-width: 400px;">
-                                    <span class="input-group-text bg-light border-0"><i class="ti ti-search text-muted"></i></span>
-                                    <input type="text" id="searchInput" class="form-control bg-light border-0" placeholder="Cari pelanggan..." value="{{ request('search') }}">
-                                </div>
-                            </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light text-muted">
-                                <tr>
-                                    <th class="ps-3 border-0 rounded-start">No</th>
-                                    <th class="border-0">Nama</th>
-                                    <th class="border-0">Email</th>
-                                    <th class="border-0">Telepon</th>
-                                    <th class="border-0 text-center">Status</th>
-                                    <th class="pe-3 border-0 rounded-end text-center" width="150">Aksi</th>
-                                </tr>
-                            </thead>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama</th>
+                                <th>Email</th>
+                                <th>Telepon</th>
+                                <th>Status</th>
+                                <th width="150">Aksi</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             @forelse($pelanggans as $index => $pelanggan)
                                 <tr class="pelanggan-row" data-name="{{ $pelanggan->name }}"
                                     data-username="{{ $pelanggan->username }}" data-email="{{ $pelanggan->email }}"
                                     data-phone="{{ $pelanggan->phone }}"
                                     data-status="{{ $pelanggan->status }}">
-                                    <td class="ps-3">{{ $index + 1 }}</td>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $pelanggan->name }}</td>
+                                    <td>{{ $pelanggan->email }}</td>
+                                    <td>{{ $pelanggan->phone ?? '-' }}</td>
+                                    <td>{{ ucfirst($pelanggan->status) }}</td>
                                     <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar bg-light-info text-info rounded-circle me-2 d-flex align-items-center justify-content-center fw-bold" style="width: 35px; height: 35px;">
-                                                {{ strtoupper(substr($pelanggan->name, 0, 1)) }}
-                                            </div>
-                                            <span class="fw-medium text-dark">{{ $pelanggan->name }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="text-muted">{{ $pelanggan->email }}</td>
-                                    <td class="text-muted">{{ $pelanggan->phone ?? '-' }}</td>
-                                    <td class="text-center">
-                                        <span class="badge {{ strtolower($pelanggan->status) === 'aktif' ? 'bg-light-success text-success' : 'bg-light-danger text-danger' }} rounded-pill px-3">
-                                            {{ ucfirst($pelanggan->status) }}
-                                        </span>
-                                    </td>
-                                    <td class="pe-3 text-center">
-                                        <div class="d-flex justify-content-center gap-2">
-                                            <button class="btn btn-icon btn-light-info rounded-circle shadow-none view-detail" data-bs-toggle="tooltip" title="Lihat Profil">
-                                                <i class="ti ti-eye"></i>
-                                            </button>
-                                            <a href="{{ route('pelanggan.edit', $pelanggan->id) }}" class="btn btn-icon btn-light-warning rounded-circle shadow-none" data-bs-toggle="tooltip" title="Edit">
-                                                <i class="ti ti-edit"></i>
-                                            </a>
-                                            <form action="{{ route('pelanggan.destroy', $pelanggan->id) }}" method="POST" class="delete-form" style="display:inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button" class="btn btn-icon btn-light-danger rounded-circle shadow-none btn-delete" data-bs-toggle="tooltip" title="Hapus">
-                                                    <i class="ti ti-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
+                                        <button class="btn btn-sm btn-info view-detail">Lihat</button>
+                                        <a href="{{ route('pelanggan.edit', $pelanggan->id) }}"
+                                            class="btn btn-sm btn-warning">Edit</a>
+                                        <form action="{{ route('pelanggan.destroy', $pelanggan->id) }}" method="POST"
+                                            style="display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-sm btn-danger"
+                                                onclick="return confirm('Hapus pelanggan ini?')">Hapus</button>
+                                        </form>
                                     </td>
                                 </tr>
                             @empty
@@ -135,51 +95,7 @@
                                 </tr>
                             @endforelse
                         </tbody>
-                        </table>
-                            </div>
-                        </div>
-
-                        <!-- TAB TRASH -->
-                        <div class="tab-pane fade" id="trash" role="tabpanel" aria-labelledby="trash-tab">
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0 text-center">
-                                    <thead class="table-light text-muted">
-                                        <tr>
-                                            <th class="ps-3 border-0 rounded-start">Nama</th>
-                                            <th class="border-0">Email</th>
-                                            <th class="border-0">Tanggal Dihapus</th>
-                                            <th class="border-0">Sisa Waktu</th>
-                                            <th class="pe-3 border-0 rounded-end">Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($trashedPelanggans as $item)
-                                        <tr>
-                                            <td class="ps-3">{{ $item->name }}</td>
-                                            <td class="text-muted">{{ $item->email }}</td>
-                                            <td>{{ $item->deleted_at->format('d/m/Y H:i') }}</td>
-                                            <td><span class="badge bg-light-warning text-warning">{{ round(30 - $item->deleted_at->diffInDays(now())) }} hari lagi</span></td>
-                                            <td class="pe-3">
-                                                <div class="d-flex justify-content-center gap-2">
-                                                    <button class="btn btn-sm btn-success rounded-pill px-3 btn-restore" data-id="{{ $item->id }}" data-type="pelanggan">
-                                                        <i class="ti ti-reload me-1"></i> Pulihkan
-                                                    </button>
-                                                    <button class="btn btn-sm btn-danger rounded-pill px-3 btn-force-delete" data-id="{{ $item->id }}" data-type="pelanggan">
-                                                        <i class="ti ti-trash-x me-1"></i> Hapus Permanen
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        @empty
-                                        <tr>
-                                            <td colspan="5" class="text-center py-4 text-muted">Keranjang sampah kosong.</td>
-                                        </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+                    </table>
                 </div>
             </div>
         </div>
@@ -225,35 +141,6 @@
             });
         });
 
-        // SweetAlert Delete Confirmation
-        $(document).on('click', '.btn-delete', function(e) {
-            e.preventDefault();
-            let form = $(this).closest('form');
-            Swal.fire({
-                title: 'Apakah Anda yakin?',
-                text: "Data pelanggan ini akan dihapus secara permanen!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal',
-                buttonsStyling: false,
-                customClass: {
-                    confirmButton: 'btn btn-danger mx-2',
-                    cancelButton: 'btn btn-secondary mx-2'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
-            });
-        });
-
-        // Tooltip init
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        });
-
         $(document).on('click', '.view-detail', function () {
             let row = $(this).closest('tr');
             $('#popupName').text(row.data('name')); 
@@ -272,86 +159,6 @@
             if (e.target.id === 'detailPopup') {
                 $(this).fadeOut();
             }
-        });
-        // ACTION: RESTORE
-        $(document).on('click', '.btn-restore', function() {
-            let id = $(this).data('id');
-            let type = $(this).data('type');
-            let tr = $(this).closest('tr');
-            
-            Swal.fire({
-                title: 'Pulihkan Pelanggan?',
-                text: "Data ini akan dikembalikan ke daftar aktif.",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Pulihkan!',
-                cancelButtonText: 'Batal',
-                buttonsStyling: false,
-                customClass: {
-                    confirmButton: 'btn btn-success mx-2',
-                    cancelButton: 'btn btn-secondary mx-2'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: `/sampah/restore/${type}/${id}`,
-                        type: 'POST',
-                        data: { _token: '{{ csrf_token() }}' },
-                        success: function(res) {
-                            if(res.success) {
-                                Swal.fire('Dipulihkan!', res.message, 'success').then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire('Gagal!', res.message, 'error');
-                            }
-                        },
-                        error: function(err) {
-                            Swal.fire('Error!', 'Terjadi kesalahan sistem.', 'error');
-                        }
-                    });
-                }
-            });
-        });
-
-        // ACTION: FORCE DELETE
-        $(document).on('click', '.btn-force-delete', function() {
-            let id = $(this).data('id');
-            let type = $(this).data('type');
-            let tr = $(this).closest('tr');
-            
-            Swal.fire({
-                title: 'Hapus Permanen?',
-                text: "Peringatan: Data ini akan terhapus selamanya!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Hapus Permanen!',
-                cancelButtonText: 'Batal',
-                buttonsStyling: false,
-                customClass: {
-                    confirmButton: 'btn btn-danger mx-2',
-                    cancelButton: 'btn btn-secondary mx-2'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: `/sampah/force-delete/${type}/${id}`,
-                        type: 'DELETE',
-                        data: { _token: '{{ csrf_token() }}' },
-                        success: function(res) {
-                            if(res.success) {
-                                Swal.fire('Terhapus!', res.message, 'success');
-                                tr.fadeOut(400, function(){ $(this).remove(); });
-                            } else {
-                                Swal.fire('Gagal!', res.message, 'error');
-                            }
-                        },
-                        error: function(err) {
-                            Swal.fire('Error!', 'Terjadi kesalahan sistem.', 'error');
-                        }
-                    });
-                }
-            });
         });
     });
 </script>
