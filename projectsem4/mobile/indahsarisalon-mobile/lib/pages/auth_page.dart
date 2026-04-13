@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:bcrypt/bcrypt.dart';
+import 'home_page.dart';
+import '../app_session.dart';
 
 class AuthPage extends StatefulWidget {
+  const AuthPage({super.key});
+
   @override
   State<AuthPage> createState() => _AuthPageState();
 }
@@ -16,27 +21,60 @@ class _AuthPageState extends State<AuthPage> {
 
   bool rememberMe = false;
 
-  // 🔥 LOGIN FUNCTION
+  // 🔥 LOGIN FUNCTION (SUPABASE)
   Future login() async {
     try {
-      var url = Uri.parse("http://192.168.0.111:8000/login");
+      final supabase = Supabase.instance.client;
+      
+      // Query ke tabel users custom di public
+      final user = await supabase
+          .from('users')
+          .select()
+          .eq('username', username.text)
+          .maybeSingle();
 
-      var response = await http.post(
-        url,
-        body: {
-          "username": username.text,
-          "password": password.text,
-        },
-      );
+      if (!mounted) return;
 
-      print("STATUS: ${response.statusCode}");
-      print("BODY: ${response.body}");
+      if (user != null) {
+        // Cek kecocokan password karena tersimpan sebagai Bcrypt hash
+        bool isPasswordCorrect = false;
+        try {
+          isPasswordCorrect = BCrypt.checkpw(password.text, user['password']);
+        } catch (e) {
+          debugPrint("Bcrypt Cek Error: $e");
+        }
 
+        if (isPasswordCorrect) {
+          // Simpan sesi pengguna
+          AppSession.userId = user['id'] as int;
+          AppSession.userName = user['name'] as String? ?? '';
+          AppSession.userRole = user['role'] as String? ?? '';
+
+          // Berhasil login
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Login berhasil!")),
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePage()),
+          );
+        } else {
+          // Gagal login - Password salah
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Username atau password salah")),
+          );
+        }
+      } else {
+        // Gagal login - Username tidak ada
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Username atau password salah")),
+        );
+      }
     } catch (e) {
-      print("ERROR: $e");
-
+      debugPrint("ERROR: $e");
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Tidak bisa connect ke server")),
+        const SnackBar(content: Text("Terjadi kesalahan saat memproses login")),
       );
     }
   }
