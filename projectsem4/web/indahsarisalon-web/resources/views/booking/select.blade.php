@@ -364,10 +364,38 @@
                     if (response.payment_method === 'transfer' && response.snap_token) {
                         // Triger Midtrans Snap
                         snap.pay(response.snap_token, {
-                            onSuccess: function(result) { $('#modalProses').modal('show'); },
-                            onPending: function(result) { $('#modalProses').modal('show'); },
-                            onError: function(result) { $('#modalProses').modal('show'); },
-                            onClose: function() { $('#modalProses').modal('show'); }
+                            onSuccess: function(result) { 
+                                $('#modalProses').modal('show'); 
+                            },
+                            onPending: function(result) { 
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Pembayaran Tertunda',
+                                    text: 'Pemesanan Anda telah dicatat. Silakan selesaikan pembayaran sesuai instruksi di Midtrans.',
+                                }).then(() => {
+                                    window.location.href = "{{ route('booking.history') }}";
+                                });
+                            },
+                            onError: function(result) { 
+                                Swal.fire('Gagal', 'Pembayaran gagal dilakukan. Silakan coba lagi.', 'error');
+                                submitBtn.prop('disabled', false).text('✅ Bayar & Konfirmasi');
+                            },
+                            onClose: function() { 
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Pembayaran Belum Selesai',
+                                    text: 'Pemesanan Anda telah tersimpan sebagai "Pending". Anda dapat melanjutkannya nanti di menu Riwayat.',
+                                    confirmButtonText: 'Tetap di Sini',
+                                    showCancelButton: true,
+                                    cancelButtonText: 'Ke Riwayat'
+                                }).then((res) => {
+                                    if (!res.isConfirmed) {
+                                        window.location.href = "{{ route('booking.history') }}";
+                                    } else {
+                                        submitBtn.prop('disabled', false).text('✅ Bayar & Konfirmasi');
+                                    }
+                                });
+                            }
                         });
                     } else {
                         // Cash payment logic

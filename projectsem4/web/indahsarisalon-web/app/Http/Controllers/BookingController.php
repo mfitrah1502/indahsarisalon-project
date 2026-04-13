@@ -11,6 +11,7 @@ use App\Models\Treatment;
 use Carbon\Carbon;
 use Midtrans\Config;
 use Midtrans\Snap;
+use Midtrans\Transaction;
 
 class BookingController extends Controller
 {
@@ -111,9 +112,10 @@ class BookingController extends Controller
         // Midtrans Logic
         $snapToken = null;
         if ($request->payment_method === 'transfer') {
+            $orderId = 'BOOK-' . $booking->id . '-' . time();
             $params = [
                 'transaction_details' => [
-                    'order_id' => 'BOOK-' . $booking->id . '-' . time(),
+                    'order_id' => $orderId,
                     'gross_amount' => (int) $total_price,
                 ],
                 'customer_details' => [
@@ -124,7 +126,10 @@ class BookingController extends Controller
 
             try {
                 $snapToken = Snap::getSnapToken($params);
-                $booking->update(['snap_token' => $snapToken]);
+                $booking->update([
+                    'snap_token' => $snapToken,
+                    'midtrans_id' => $orderId
+                ]);
             } catch (\Exception $e) {
                 if ($request->ajax()) {
                     return response()->json(['message' => 'Gagal terhubung ke Midtrans: ' . $e->getMessage()], 500);
@@ -302,5 +307,44 @@ class BookingController extends Controller
         $booking->update(['status' => $request->status]);
 
         return redirect()->back()->with('success', 'Status booking berhasil diperbarui.');
+    }
+
+    // AJAX: Verifikasi status ke Midtrans (Helper untuk localhost & auto-sync)
+    public function verify($id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        if (!$booking->midtrans_id) {
+            return response()->json(['success' => false, 'message' => 'Order ID tidak ditemukan.']);
+        }
+
+        try {
+            $status = Transaction::status($booking->midtrans_id);
+            
+            $transactionStatus = $status->transaction_status;
+            $paymentStatus = $booking->payment_status;
+
+            if (in_array($transactionStatus, ['settlement', 'capture'])) {
+                $paymentStatus = 'paid';
+            } elseif ($transactionStatus == 'pending') {
+                $paymentStatus = 'pending';
+            } elseif (in_array($transactionStatus, ['deny', 'expire', 'cancel'])) {
+                $paymentStatus = 'failed';
+            }
+
+            if ($booking->payment_status !== $paymentStatus) {
+                $booking->update(['payment_status' => $paymentStatus]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'payment_status' => $paymentStatus,
+                'transaction_status' => $transactionStatus,
+                'message' => 'Status diperbarui.'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Gagal verifikasi: ' . $e->getMessage()]);
+        }
     }
 }

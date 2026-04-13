@@ -245,6 +245,7 @@
 </div>
 
 @push('scripts')
+<script src="{{ config('services.midtrans.is_production') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
@@ -291,7 +292,27 @@
                     <span class="text-muted">Total Tagihan</span>
                     <span class="fw-bold text-primary">Rp ${new Intl.NumberFormat('id-ID').format(booking.total_price)}</span>
                 </div>
+                <div class="list-group-item d-flex justify-content-between px-0">
+                    <span class="text-muted">Status Pembayaran</span>
+                    <div>
+                        <span class="badge ${booking.payment_status === 'paid' ? 'bg-light-success text-success' : 'bg-light-danger text-danger'} px-3" id="paymentStatusBadge">
+                            ${booking.payment_status === 'paid' ? 'Lunas' : 'Belum Bayar'}
+                        </span>
+                        ${booking.payment_status !== 'paid' && booking.midtrans_id ? `
+                            <a href="javascript:void(0)" class="ms-2 small text-primary" onclick="verifyPayment(${booking.id})">
+                                <i class="ti ti-refresh"></i> Cek Status
+                            </a>
+                        ` : ''}
+                    </div>
+                </div>
             </div>
+            ${booking.payment_status !== 'paid' && booking.payment_method === 'transfer' && booking.snap_token ? `
+                <div class="d-grid mb-3" id="payButtonContainer">
+                    <button type="button" class="btn btn-primary fw-bold py-2" onclick="payNow('${booking.snap_token}')">
+                        <i class="ti ti-credit-card me-2"></i>Bayar Sekarang
+                    </button>
+                </div>
+            ` : ''}
             <div class="alert alert-light-info border-0 d-flex align-items-center mb-0">
                 <i class="ti ti-info-circle me-2 h4 mb-0"></i>
                 <small>Mohon datang 10 menit sebelum jadwal untuk verifikasi.</small>
@@ -300,6 +321,60 @@
         
         $('#detailContent').html(html);
         $('#modalDetail').modal('show');
+
+        // Auto-verify if payment is not paid and it's a transfer
+        if (booking.payment_status !== 'paid' && booking.midtrans_id) {
+            verifyPayment(booking.id, true);
+        }
+    }
+
+    function verifyPayment(id, silent = false) {
+        if (!silent) {
+            Swal.fire({
+                title: 'Memeriksa...',
+                text: 'Menghubungkan ke server Midtrans',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+        }
+
+        $.get(`/booking/verify/${id}`, function(res) {
+            if (res.success) {
+                if (res.payment_status === 'paid') {
+                    $('#paymentStatusBadge').removeClass('bg-light-danger text-danger').addClass('bg-light-success text-success').text('Lunas');
+                    $('#payButtonContainer').fadeOut();
+                    if (!silent) {
+                        Swal.fire('Berhasil', 'Pembayaran telah dikonfirmasi!', 'success').then(() => {
+                            location.reload();
+                        });
+                    }
+                } else {
+                    if (!silent) {
+                        Swal.fire('Info', 'Status pembayaran: ' + res.transaction_status, 'info');
+                    }
+                }
+            } else {
+                if (!silent) {
+                    Swal.fire('Gagal', res.message, 'error');
+                }
+            }
+        });
+    }
+
+    function payNow(snapToken) {
+        window.snap.pay(snapToken, {
+            onSuccess: function(result) {
+                Swal.fire('Berhasil', 'Pembayaran berhasil dikonfirmasi!', 'success').then(() => {
+                    location.reload();
+                });
+            },
+            onPending: function(result) {
+                Swal.fire('Pending', 'Mohon selesaikan pembayaran Anda.', 'info');
+            },
+            onError: function(result) {
+                Swal.fire('Gagal', 'Pembayaran gagal dilakukan.', 'error');
+            }
+        });
     }
 
     $(document).ready(function() {

@@ -76,14 +76,17 @@
         document.getElementById('pay-button')?.onclick = function() {
             snap.pay('{{ $booking->snap_token }}', {
                 onSuccess: function(result) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Pembayaran Berhasil!',
-                        text: 'Terima kasih, pembayaran Anda telah kami terima.',
-                        showConfirmButton: false,
-                        timer: 2500
-                    }).then(() => {
-                        window.location.href = "{{ route('booking.history') }}";
+                    // Verifikasi instan ke server lokal
+                    $.get(`/booking/verify/{{ $booking->id }}`, function() {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Pembayaran Berhasil!',
+                            text: 'Terima kasih, pembayaran Anda telah kami terima.',
+                            showConfirmButton: false,
+                            timer: 2500
+                        }).then(() => {
+                            window.location.href = "{{ route('booking.history') }}";
+                        });
                     });
                 },
                 onPending: function(result) {
