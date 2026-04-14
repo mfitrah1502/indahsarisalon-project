@@ -1,5 +1,7 @@
 # indahsarisalon-project
-Hello, this is our project
+repo web dan mobile pindah kesini, repo ini rusak
+[](https://github.com/mfitrah1502/indahsarisalon-web)
+[](https://github.com/mfitrah1502/indahsarisalon-mobile)
 
 
 # Branch
